@@ -323,7 +323,7 @@ int main(int argc, char *argv[]) {
 	int i;
 	unsigned cycles_per_iter;
 	char hostname[128] = "localhost";
-	char port_number[7] = ":9980";
+	char port_number[7] = ":9910";
 	double hash_rate;
 
 	// Parse args.
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
 			printf("\n");
 			printf("\t H - host: which host name to use when talking to the sentientd api. (default: %s)\n", hostname);
 			printf("\n");
-			printf("\t P - port: which port to use when talking to the sentientd api. (e.g. -p :9980)\n");
+			printf("\t P - port: which port to use when talking to the sentientd api. (e.g. -p :9910)\n");
 			printf("\n");
 			printf("\t p - OpenCL platform ID: Just what it says on the tin. If you're finding no GPUs,\n");
 			printf("\t\tyet you're sure they exist, try a value other than 0, like 1, or 2. Default is 0.\n");
@@ -428,7 +428,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'P':
 			if (++i >= argc) {
-				printf("Please pass in a port number following your flag (e.g. -P :9980)\n");
+				printf("Please pass in a port number following your flag (e.g. -P :9910)\n");
 				exit(1);
 			}
 			if (strlen(argv[i]) < 6) {
