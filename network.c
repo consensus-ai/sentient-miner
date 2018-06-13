@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 #include <unistd.h>
 #endif
-#ifdef __WINDOWS__
+#if defined(__WINDOWS__)
 #include <windows.h>
 #endif
 
@@ -24,6 +24,16 @@ char *bfw_url, *submit_url;
 
 // CURL object to connect to sentientd
 CURL *curl;
+
+void sleep_seconds(int n) {
+	#if defined(__linux__) || defined(__APPLE__)
+	sleep(n);
+	#endif
+
+	#if defined(__WINDOWS__)
+	Sleep(n * 1000);
+	#endif
+}
 
 // check_http_response
 int check_http_response(CURL *curl) {
@@ -92,12 +102,7 @@ int get_header_for_work(uint8_t *target, uint8_t *header) {
 		fprintf(stderr, "Failed to get header from %s, curl_easy_perform() failed: %s\n", bfw_url, curl_easy_strerror(res));
 		fprintf(stderr, "Are you sure that sentientd is running?\n");
 		// Pause in order to prevent spamming the console
-#ifdef __linux__
-		sleep(3); // 3 seconds
-#endif
-#ifdef __WINDOWS__
-		Sleep(3000); // 3 seconds
-#endif
+		sleep_seconds(3);
 	}
 
 	if (check_http_response(curl)) {
