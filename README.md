@@ -7,9 +7,44 @@ cards will see greatly increased hashrates by increasing the value of 'I'
 ## Install dependencies (ubuntu 16.04)
 
 #### On ubuntu 16.04
-```
-sudo apt-get install opencl-headers libcurl4-gnutls-dev
+```bash
+sudo apt-get install -y ocl-icd-libopencl1 opencl-headers clinfo libcurl4-gnutls-dev
 sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
+
+# check OpenCL platforms
+clinfo
+```
+
+#### On AWS, p2 instance
+Install NVIDIA drivers first, using the guide here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html
+
+E.g. at the time of writing, these are the steps that worked (double check the version strings when you run this, in case there's a newer version available):
+
+```bash
+sudo apt-get update -y
+sudo apt-get upgrade -y linux-aws
+sudo reboot
+
+sudo apt-get install -y gcc make linux-headers-$(uname -r)
+
+wget http://us.download.nvidia.com/tesla/396.26/NVIDIA-Linux-x86_64-396.26.run
+# select all default options
+sudo /bin/sh ./NVIDIA-Linux-x86_64-396.26.run
+sudo reboot
+
+# check driver config
+nvidia-smi -q | head
+```
+
+Optionally, follow the optimization steps here:
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/optimize_gpu.html
+
+Here's what worked at the time of writing this:
+
+```bash
+nvidia-persistenced
+nvidia-smi --auto-boost-default=0
+nvidia-smi -ac 2505,875
 ```
 
 #### On OSX High Sierra 10.13.5
