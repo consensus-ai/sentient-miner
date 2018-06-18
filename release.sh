@@ -37,7 +37,12 @@ mkdir release
 (
   cd release
   cp ../$compiledBinary $binaryName
+
+  # NOTE: we have to include the CL kernel as it's being read into the executable at runtime.
+  # Eventually we could switch this to Go, or C++ where we can make use of raw string imports
+  # to statically read the file into the binary at compile time.
   cp ../$kernelFile .
+
   chmod +x $binaryName
   zip -r $zipFile $binaryName $kernelFile
 
