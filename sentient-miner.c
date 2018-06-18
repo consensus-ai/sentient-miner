@@ -76,7 +76,7 @@ void quitSignal(int unused) {
 // Returns -1 if it finds a block, otherwise it returns the hash_rate of the GPU
 double grindNonces(int cycles_per_iter) {
 	// Start timing this iteration.
-	#ifdef __linux__
+	#if defined(__linux__) || defined(__APPLE__)
 	struct timespec begin, end;
 	clock_gettime(CLOCK_REALTIME, &begin);
 	#else
@@ -153,7 +153,7 @@ double grindNonces(int cycles_per_iter) {
 	}
 
 	// Get the time elapsed this function.
-	#ifdef __linux__
+	#if defined(__linux__) || defined(__APPLE__)
 	clock_gettime(CLOCK_REALTIME, &end);
 	double nsElapsed = 1e9 * (double)(end.tv_sec - begin.tv_sec) + (double)(end.tv_nsec - begin.tv_nsec);
 	double run_time_seconds = nsElapsed * 1e-9;
