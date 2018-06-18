@@ -106,6 +106,8 @@ int get_header_for_work(uint8_t *target, uint8_t *header) {
 	}
 
 	if (check_http_response(curl)) {
+		// Pause in order to prevent spamming the console
+		sleep_seconds(3);
 		return 1;
 	}
 	if (inBuf.len != 112) {
