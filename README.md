@@ -47,6 +47,11 @@ nvidia-smi --auto-boost-default=0
 nvidia-smi -ac 2505,875
 ```
 
+You might also be interested in seeing what the current clock speeds are set to:
+```bash
+nvidia-smi  -q -i 0 -d CLOCK
+```
+
 #### On OSX High Sierra 10.13.5
 
 OpenCL should already be installed. Nothing to do.
