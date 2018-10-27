@@ -1,103 +1,88 @@
-# Sentient-Miner
-A GPU miner designed for mining SEN. This miner runs in a command prompt
-and prints your hashrate along side the number of blocks you've mined. Most
-cards will see greatly increased hashrates by increasing the value of 'I'
-(default is 16, optimal is typically 20-25). Be careful with adjusting this parameter as it may crash the miner, or freeze the output.
+# gominer
+GPU miner for sia in go
 
-## Install dependencies (ubuntu 16.04)
+All available opencl capable GPU's are detected and used in parallel.
 
-#### On ubuntu 16.04
-```bash
-sudo apt-get install -y ocl-icd-libopencl1 opencl-headers clinfo libcurl4-gnutls-dev
-sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
+## Binary releases
 
-# check OpenCL platforms
-clinfo
+[Binaries for Windows and Linux are available in the corresponding releases](https://github.com/robvanmieghem/gominer/releases)
+
+
+## Installation from source
+
+### Prerequisites
+* go version 1.4.2 or above (earlier version might work or not), check with `go version`
+* opencl libraries on the library path
+* gcc
+
+```
+go get github.com/robvanmieghem/gominer
 ```
 
-#### On AWS, p2 instance
-Install NVIDIA drivers first, using the guide here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html
-
-E.g. at the time of writing, these are the steps that worked (double check the version strings when you run this, in case there's a newer version available):
-
-```bash
-sudo apt-get update -y
-sudo apt-get upgrade -y linux-aws
-sudo reboot
-
-sudo apt-get install -y gcc make linux-headers-$(uname -r)
-
-wget http://us.download.nvidia.com/tesla/396.26/NVIDIA-Linux-x86_64-396.26.run
-# select all default options
-sudo /bin/sh ./NVIDIA-Linux-x86_64-396.26.run
-sudo reboot
-
-# check driver config
-nvidia-smi -q | head
+## Run
+```
+gominer
 ```
 
-Optionally, follow the optimization steps here:
-https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/optimize_gpu.html
-
-Here's what worked at the time of writing this:
-
-```bash
-nvidia-persistenced
-nvidia-smi --auto-boost-default=0
-nvidia-smi -ac 2505,875
+Usage:
+```
+  -url string
+    	siad host and port (default "localhost:9980")
+        for stratum servers, use `stratum+tcp://<host>:<port>`
+  -user string
+        username, most stratum servers take this in the form [payoutaddress].[rigname]
+        This is optional, if solo mining sia, this is not needed
+  -I int
+    	Intensity (default 28)
+  -E string
+        Exclude GPU's: comma separated list of devicenumbers
+  -cpu
+    	If set, also use the CPU for mining, only GPU's are used by default
+  -v	Show version and exit
 ```
 
-You might also be interested in seeing what the current clock speeds are set to:
-```bash
-nvidia-smi  -q -i 0 -d CLOCK
-```
+See what intensity gives you the best hashrate, increasing the intensity also increases the stale rate though.
+##EXAMPLES
+**poolmining:**
+`gominer -url stratum+tcp://siamining.com:3333 -I 28 -user 9afafe46fbd4d2fc3f6dd61ae36686a8ce3d9ddd84a8c8fa72dddb5fe09e6e61f2e2e60f974c.example`
+**solomining:**
+start siad with the miner module enabled and start gominer:
+`siad -M cghrtwm`
+`gominer`
 
-#### On OSX High Sierra 10.13.5
+## Stratum support
 
-OpenCL should already be installed. Nothing to do.
+Stratum support is implemented as defined on https://siamining.com/stratum
 
-## How to Use
-1) Build the miner by running `make`.
+## Developer fee
 
-2) Make sure you have a recent version of `sentientd` installed and running.
+A developer fee of 1% is created by submitting 1% of the shares for my address if using the stratum protocol. The code is open source so you can simply remove that line if you want to. To make it easy for you, the exact line is https://github.com/robvanmieghem/gominer/blob/master/algorithms/sia/siastratum.go#L307 if you do not want to support the gominer development.
 
-3) Run the miner by running `./sentient-miner`. It will mine blocks until killed with Ctrl-C.
+## FAQ
+- ERROR fetching work - Status code 404
 
-## Configuration
-You can tweak the miner settings with five command-line arguments: `-I`, `-C`, `-p`, `-d`, and `-P`.
-* -I controls the intensity. On each GPU call, the GPU will do 2^I hashes. The
-  default value is low to prevent certain GPUs from crashing immediately at
-  startup. Most cards will benefit substantially from increasing the value. The
-  default is 16, but recommended (for most cards) is 20-25.
-* -C controls how frequently calls to sentientd are made. Reducing it substantially
-  could cause instability to the miner. Increasing it will reduce the frequency
-  at which the hashrate is updated. If a low 'I' is being used, a high 'C'
-  should be used. As a rule of thumb, the hashrate should only be updating a
-  few times per second. The default is 30.
-* -p allows you to pick a platform. Default is the first platform (indexing
-  from 0).
-* -d allows you to pick which device to copmute on. Default is the first device
-  (indexing from 0).
-* -P changes the port that the miner makes API calls to. Use this if you
-  configured Sentient to be on a port other than the default. Default is 9910.
+  If you are solomining, make siad is running and the miner module is enabled in siad: `siad -M cghrtwm`
 
-If you wanted to run the program on platform 0, device 1, with an intensity of
-24, you would call `./sentient-miner -d 1 -I 24`
+- ERROR fetching work - Get http://localhost:9980/miner/header: dial tcp 127.0.0.1:9980: connection refused
 
-## Multiple GPUs
-Each instance of the miner can only point to a single GPU. To mine on multiple
-GPUs at the same time, you will need to run multiple instances of the miner and
-point each at a different gpu. Only one instance of 'sentientd' needs to be running,
-all of the miners can point to it.
+  Make sure `siad` is running
 
-It is highly recommended that you greatly increase the value of 'C' when using
-multiple miners. As a rule of thumb, the hashrate for each miner should be
-updating one time per [numGPUs] seconds. You should not mine with more than 6
-cards at a time (per instance of sentientd).
+- What is `siad`?
 
-## Notes
-*    Each Sen block takes about 10 minutes to mine.
-*    Once a block is mined, Sentient waits for 144 confirmation blocks before the
-	 reward is added to your wallet, which takes about 24 hours.
-*    Sentient currently doesn't have any mining pools.
-*    Windows is poorly supported. For best results, use Linux when mining.
+  Check the sia documentation
+
+- I don't know how to set up siad or the sia UI wallet, how do I do that?
+
+  Check the sia documentation.
+
+- You have to help me set up mining SIA
+
+  No I don't
+
+## Support development
+
+If you really want to, you can support the gominer development:
+
+SIA: 79b9089439218734192db7016f07dc5a0e2a95e873992dd782a1e1306b2c44e116e1d8ded910
+
+BTC: 1LYjTFXr4RfFT2gQkAswk5Juua7cnjVyMf
