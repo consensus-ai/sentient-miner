@@ -22,8 +22,7 @@ RUN curl -s https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd6
 ENV GOPATH=/home/$USER/go
 ENV GOROOT=/usr/local/go
 RUN mkdir -p $GOPATH/bin && \
-    mkdir -p $GOPATH/src && \
-    chown -R $USER:$USER $GOPATH
+    mkdir -p $GOPATH/src
 ENV PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
 RUN curl https://glide.sh/get | sh
@@ -31,10 +30,11 @@ RUN curl https://glide.sh/get | sh
 WORKDIR $GOPATH/src/github.com/consensus-ai/sentient-miner
 
 COPY . .
+RUN chown -R $USER:$USER $GOPATH
 
 USER $USER
 
-# RUN make dependencies
+RUN make dependencies
 # RUN make dev
 RUN make release
 
