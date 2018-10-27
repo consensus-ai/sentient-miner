@@ -5,7 +5,7 @@ All available opencl capable GPU's are detected and used in parallel.
 
 ## Binary releases
 
-[Binaries for Windows and Linux are available in the corresponding releases](https://github.com/robvanmieghem/gominer/releases)
+[Binaries for Windows and Linux are available in the corresponding releases](https://github.com/consensus-ai/sentient-miner/releases)
 
 
 ## Installation from source
@@ -16,7 +16,7 @@ All available opencl capable GPU's are detected and used in parallel.
 * gcc
 
 ```
-go get github.com/robvanmieghem/gominer
+go get github.com/consensus-ai/sentient-miner
 ```
 
 ## Run
@@ -56,7 +56,7 @@ Stratum support is implemented as defined on https://siamining.com/stratum
 
 ## Developer fee
 
-A developer fee of 1% is created by submitting 1% of the shares for my address if using the stratum protocol. The code is open source so you can simply remove that line if you want to. To make it easy for you, the exact line is https://github.com/robvanmieghem/gominer/blob/master/algorithms/sia/siastratum.go#L307 if you do not want to support the gominer development.
+A developer fee of 1% is created by submitting 1% of the shares for my address if using the stratum protocol. The code is open source so you can simply remove that line if you want to. To make it easy for you, the exact line is https://github.com/consensus-ai/sentient-miner/blob/master/algorithms/sia/siastratum.go#L307 if you do not want to support the gominer development.
 
 ## FAQ
 - ERROR fetching work - Status code 404

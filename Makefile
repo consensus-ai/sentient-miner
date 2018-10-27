@@ -4,8 +4,8 @@ GIT_REVISION=$(shell git rev-parse --short HEAD)
 GIT_DIRTY=$(shell git diff-index --quiet HEAD -- || echo "✗-")
 
 # sets values of version string variables
-ldflags= -X "github.com/robvanmieghem/gominer/build.GitRevision=${GIT_DIRTY}${GIT_REVISION}" \
--X "github.com/robvanmieghem/gominer/build.BuildTime=${BUILD_TIME}"
+ldflags= -X "github.com/consensus-ai/sentient-miner/build.GitRevision=${GIT_DIRTY}${GIT_REVISION}" \
+-X "github.com/consensus-ai/sentient-miner/build.BuildTime=${BUILD_TIME}"
 
 # all will build and install release binaries
 all: release

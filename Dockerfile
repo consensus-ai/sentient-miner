@@ -28,7 +28,7 @@ ENV PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
 RUN curl https://glide.sh/get | sh
 
-WORKDIR $GOPATH/src/github.com/robvanmieghem/gominer
+WORKDIR $GOPATH/src/github.com/consensus-ai/sentient-miner
 
 COPY . .
 

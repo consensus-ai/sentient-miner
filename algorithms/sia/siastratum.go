@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/robvanmieghem/gominer/clients"
-	"github.com/robvanmieghem/gominer/clients/stratum"
+	"github.com/consensus-ai/sentient-miner/clients"
+	"github.com/consensus-ai/sentient-miner/clients/stratum"
 )
 
 const (

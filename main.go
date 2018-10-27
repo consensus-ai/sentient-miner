@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/robvanmieghem/go-opencl/cl"
-	"github.com/robvanmieghem/gominer/algorithms/sia"
-	"github.com/robvanmieghem/gominer/mining"
+	"github.com/consensus-ai/sentient-miner/algorithms/sia"
+	"github.com/consensus-ai/sentient-miner/mining"
 )
 
 //Version is the released version string of gominer

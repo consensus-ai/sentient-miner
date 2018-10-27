@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/robvanmieghem/go-opencl/cl"
-	"github.com/robvanmieghem/gominer/mining"
+	"github.com/consensus-ai/sentient-miner/mining"
 )
 
 var provenSolutions = []struct {
