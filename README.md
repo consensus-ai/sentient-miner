@@ -1,4 +1,4 @@
-# gominer
+# sentient-miner
 GPU miner for sia in go
 
 All available opencl capable GPU's are detected and used in parallel.
@@ -21,7 +21,7 @@ go get github.com/consensus-ai/sentient-miner
 
 ## Run
 ```
-gominer
+sentient-miner
 ```
 
 Usage:
@@ -42,13 +42,15 @@ Usage:
 ```
 
 See what intensity gives you the best hashrate, increasing the intensity also increases the stale rate though.
-##EXAMPLES
+
+## Examples
 **poolmining:**
-`gominer -url stratum+tcp://siamining.com:3333 -I 28 -user 9afafe46fbd4d2fc3f6dd61ae36686a8ce3d9ddd84a8c8fa72dddb5fe09e6e61f2e2e60f974c.example`
+`sentient-miner -url stratum+tcp://siamining.com:3333 -I 28 -user 9afafe46fbd4d2fc3f6dd61ae36686a8ce3d9ddd84a8c8fa72dddb5fe09e6e61f2e2e60f974c.example`
+
 **solomining:**
-start siad with the miner module enabled and start gominer:
+start siad with the miner module enabled and start sentient-miner:
 `siad -M cghrtwm`
-`gominer`
+`sentient-miner`
 
 ## Stratum support
 
@@ -56,7 +58,7 @@ Stratum support is implemented as defined on https://siamining.com/stratum
 
 ## Developer fee
 
-A developer fee of 1% is created by submitting 1% of the shares for my address if using the stratum protocol. The code is open source so you can simply remove that line if you want to. To make it easy for you, the exact line is https://github.com/consensus-ai/sentient-miner/blob/master/algorithms/sia/siastratum.go#L307 if you do not want to support the gominer development.
+A developer fee of 1% is created by submitting 1% of the shares for my address if using the stratum protocol. The code is open source so you can simply remove that line if you want to. To make it easy for you, the exact line is https://github.com/consensus-ai/sentient-miner/blob/master/algorithms/sia/siastratum.go#L307 if you do not want to support the sentient-miner development.
 
 ## FAQ
 - ERROR fetching work - Status code 404
@@ -81,7 +83,7 @@ A developer fee of 1% is created by submitting 1% of the shares for my address i
 
 ## Support development
 
-If you really want to, you can support the gominer development:
+If you really want to, you can support the sentient-miner development:
 
 SIA: 79b9089439218734192db7016f07dc5a0e2a95e873992dd782a1e1306b2c44e116e1d8ded910
 

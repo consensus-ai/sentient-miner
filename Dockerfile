@@ -38,4 +38,4 @@ USER $USER
 # RUN make dev
 RUN make release
 
-CMD ["sh", "-c", "$GOPATH/bin/gominer"]
+CMD ["sh", "-c", "$GOPATH/bin/sentient-miner"]

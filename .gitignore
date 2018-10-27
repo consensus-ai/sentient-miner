@@ -22,7 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
-gominer
+sentient-miner
 .vscode
 .vscode
 debug

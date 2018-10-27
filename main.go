@@ -14,7 +14,7 @@ import (
 	"github.com/consensus-ai/sentient-miner/mining"
 )
 
-//Version is the released version string of gominer
+//Version is the released version string of sentient-miner
 var Version = "0.6.2-Dev"
 
 var intensity = 28
@@ -31,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	if *printVersion {
-		fmt.Println("gominer version", Version)
+		fmt.Println("sentient-miner version", Version)
 		os.Exit(0)
 	}
 
