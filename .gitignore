@@ -26,3 +26,5 @@ gominer
 .vscode
 .vscode
 debug
+
+vendor/
