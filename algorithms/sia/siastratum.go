@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dchest/blake2b"
 	"github.com/robvanmieghem/gominer/clients"
 	"github.com/robvanmieghem/gominer/clients/stratum"
 )
@@ -274,14 +273,20 @@ func (sc *StratumClient) GetHeaderForWork() (target, header []byte, deprecationC
 	arbtx = append(arbtx, sc.extranonce1...)
 	arbtx = append(arbtx, en2...)
 	arbtx = append(arbtx, sc.currentJob.Coinbase2...)
-	arbtxHash := blake2b.Sum256(arbtx)
+
+	senHash := NewSenHash()
+	senHash.Write(arbtx)
+	arbtxHash := senHash.Sum([]byte{})
 
 	//Construct the merkleroot from the arbitrary transaction and the merklebranches
 	merkleRoot := arbtxHash
 	for _, h := range sc.currentJob.MerkleBranch {
 		m := append([]byte{1}[:], h...)
 		m = append(m, merkleRoot[:]...)
-		merkleRoot = blake2b.Sum256(m)
+
+		senHash := NewSenHash()
+		senHash.Write(m)
+		merkleRoot = senHash.Sum([]byte{})
 	}
 
 	//Construct the header
