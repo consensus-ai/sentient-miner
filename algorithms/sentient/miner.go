@@ -217,5 +217,4 @@ func (miner *singleDeviceMiner) mine() {
 		hashRate := float64(miner.GlobalItemSize) / (time.Since(start).Seconds() * 1000000)
 		miner.HashRateReports <- &mining.HashRateReport{MinerID: miner.MinerID, HashRate: hashRate}
 	}
-
 }
