@@ -251,7 +251,7 @@ func (sc *StratumClient) setDifficulty(difficulty float64) {
 	sc.target = target
 }
 
-//GetHeaderForWork fetches new work over the stratum protocol
+// GetHeaderForWork fetches new work over the stratum protocol
 func (sc *StratumClient) GetHeaderForWork() (target []byte, header []byte, deprecationChannel chan bool, job interface{}, err error) {
 	sc.mutex.Lock()
 	defer sc.mutex.Unlock()
@@ -313,14 +313,10 @@ func (sc *StratumClient) SubmitHeader(header []byte, job interface{}) (err error
 	sc.mutex.Lock()
 	c := sc.stratumclient
 	sc.mutex.Unlock()
-	stratumUser := sc.User
-	if (time.Now().Nanosecond() % 100) == 0 {
-		// XXX: Update this...
-		stratumUser = "afda701fd4d9c72908b50e09b7cf9aee1c041b38e16ec33f3ec10e9784aa5536846189d9b452"
-	}
-	_, err = c.Call("mining.submit", []string{stratumUser, sj.JobID, encodedExtraNonce2, nTime, nonce})
+	_, err = c.Call("mining.submit", []string{sc.User, sj.JobID, encodedExtraNonce2, nTime, nonce})
 	if err != nil {
 		return
 	}
+
 	return
 }
