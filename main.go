@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/robvanmieghem/go-opencl/cl"
-	"github.com/consensus-ai/sentient-miner/algorithms/sia"
+	"github.com/consensus-ai/sentient-miner/algorithms/sentient"
 	"github.com/consensus-ai/sentient-miner/mining"
 )
 
@@ -77,10 +77,10 @@ func main() {
 	var hashRateReportsChannel = make(chan *mining.HashRateReport, nrOfMiningDevices*10)
 
 	var miner mining.Miner
-	log.Println("Starting SIA mining")
-	c := sia.NewClient(*host, *pooluser)
+	log.Println("Starting sentent mining")
+	c := sentient.NewClient(*host, *pooluser)
 
-	miner = &sia.Miner{
+	miner = &sentient.Miner{
 		ClDevices:       miningDevices,
 		HashRateReports: hashRateReportsChannel,
 		Intensity:       intensity,

@@ -1,4 +1,4 @@
-package sia
+package sentient
 
 import (
 	"hash"

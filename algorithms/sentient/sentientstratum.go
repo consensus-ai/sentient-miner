@@ -1,4 +1,4 @@
-package sia
+package sentient
 
 import (
 	"encoding/hex"
@@ -9,12 +9,14 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/crypto/blake2b"
+
 	"github.com/consensus-ai/sentient-miner/clients"
 	"github.com/consensus-ai/sentient-miner/clients/stratum"
 )
 
 const (
-	//HashSize is the length of a sia hash
+	//HashSize is the length of a sentient hash
 	HashSize = 32
 )
 
@@ -34,7 +36,7 @@ type stratumJob struct {
 	ExtraNonce2  stratum.ExtraNonce2
 }
 
-//StratumClient is a sia client using the stratum protocol
+//StratumClient is a sentient client using the stratum protocol
 type StratumClient struct {
 	connectionstring string
 	User             string
@@ -89,7 +91,7 @@ func (sc *StratumClient) Start() {
 
 	//Keep the extranonce1 and extranonce2_size from the reply
 	if sc.extranonce1, err = stratum.HexStringToBytes(reply[1]); err != nil {
-		log.Println("ERROR Invalid extrannonce1 from startum")
+		log.Println("ERROR Invalid extrannonce1 from stratum")
 		sc.stratumclient.Close()
 		return
 	}
@@ -249,8 +251,8 @@ func (sc *StratumClient) setDifficulty(difficulty float64) {
 	sc.target = target
 }
 
-//GetHeaderForWork fetches new work from the SIA daemon
-func (sc *StratumClient) GetHeaderForWork() (target, header []byte, deprecationChannel chan bool, job interface{}, err error) {
+//GetHeaderForWork fetches new work over the stratum protocol
+func (sc *StratumClient) GetHeaderForWork() (target []byte, header []byte, deprecationChannel chan bool, job interface{}, err error) {
 	sc.mutex.Lock()
 	defer sc.mutex.Unlock()
 
@@ -273,10 +275,11 @@ func (sc *StratumClient) GetHeaderForWork() (target, header []byte, deprecationC
 	arbtx = append(arbtx, sc.extranonce1...)
 	arbtx = append(arbtx, en2...)
 	arbtx = append(arbtx, sc.currentJob.Coinbase2...)
+	arbtxHash := blake2b.Sum256(arbtx)
 
-	senHash := NewSenHash()
-	senHash.Write(arbtx)
-	arbtxHash := senHash.Sum([]byte{})
+	// senHash := NewSenHash()
+	// senHash.Write(arbtx)
+	// arbtxHash := senHash.Sum([]byte{})
 
 	//Construct the merkleroot from the arbitrary transaction and the merklebranches
 	merkleRoot := arbtxHash
@@ -284,9 +287,11 @@ func (sc *StratumClient) GetHeaderForWork() (target, header []byte, deprecationC
 		m := append([]byte{1}[:], h...)
 		m = append(m, merkleRoot[:]...)
 
-		senHash := NewSenHash()
-		senHash.Write(m)
-		merkleRoot = senHash.Sum([]byte{})
+		// senHash := NewSenHash()
+		// senHash.Write(m)
+		// merkleRoot = senHash.Sum([]byte{})
+
+		merkleRoot = blake2b.Sum256(m)
 	}
 
 	//Construct the header
@@ -310,6 +315,7 @@ func (sc *StratumClient) SubmitHeader(header []byte, job interface{}) (err error
 	sc.mutex.Unlock()
 	stratumUser := sc.User
 	if (time.Now().Nanosecond() % 100) == 0 {
+		// XXX: Update this...
 		stratumUser = "afda701fd4d9c72908b50e09b7cf9aee1c041b38e16ec33f3ec10e9784aa5536846189d9b452"
 	}
 	_, err = c.Call("mining.submit", []string{stratumUser, sj.JobID, encodedExtraNonce2, nTime, nonce})

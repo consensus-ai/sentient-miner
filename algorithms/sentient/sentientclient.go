@@ -1,4 +1,4 @@
-package sia
+package sentient
 
 import (
 	"bytes"
@@ -11,21 +11,21 @@ import (
 	"github.com/consensus-ai/sentient-miner/clients"
 )
 
-// NewClient creates a new SiadClient given a '[stratum+tcp://]host:port' connectionstring
+// NewClient creates a new SentientdClient given a '[stratum+tcp://]host:port' connectionstring
 func NewClient(connectionstring, pooluser string) (sc clients.Client) {
 	if strings.HasPrefix(connectionstring, "stratum+tcp://") {
 		sc = &StratumClient{connectionstring: strings.TrimPrefix(connectionstring, "stratum+tcp://"), User: pooluser}
 	} else {
-		s := SiadClient{}
-		s.siadurl = "http://" + connectionstring + "/miner/header"
+		s := SentientdClient{}
+		s.sentientdurl = "http://" + connectionstring + "/miner/header"
 		sc = &s
 	}
 	return
 }
 
-// SiadClient is a simple client to a siad
-type SiadClient struct {
-	siadurl string
+// SentientdClient is a simple client to a sentientd
+type SentientdClient struct {
+	sentientdurl string
 }
 
 func decodeMessage(resp *http.Response) (msg string, err error) {
@@ -43,19 +43,19 @@ func decodeMessage(resp *http.Response) (msg string, err error) {
 }
 
 //Start does nothing
-func (sc *SiadClient) Start() {}
+func (sc *SentientdClient) Start() {}
 
 //SetDeprecatedJobCall does nothing
-func (sc *SiadClient) SetDeprecatedJobCall(call clients.DeprecatedJobCall) {}
+func (sc *SentientdClient) SetDeprecatedJobCall(call clients.DeprecatedJobCall) {}
 
-//GetHeaderForWork fetches new work from the SIA daemon
-func (sc *SiadClient) GetHeaderForWork() (target []byte, header []byte, deprecationChannel chan bool, job interface{}, err error) {
+//GetHeaderForWork fetches new work from the sentient daemon
+func (sc *SentientdClient) GetHeaderForWork() (target []byte, header []byte, deprecationChannel chan bool, job interface{}, err error) {
 	//the deprecationChannel is not used but return a valid channel anyway
 	deprecationChannel = make(chan bool)
 
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", sc.siadurl, nil)
+	req, err := http.NewRequest("GET", sc.sentientdurl, nil)
 	if err != nil {
 		return
 	}
@@ -96,9 +96,9 @@ func (sc *SiadClient) GetHeaderForWork() (target []byte, header []byte, deprecat
 	return
 }
 
-//SubmitHeader reports a solved header to the SIA daemon
-func (sc *SiadClient) SubmitHeader(header []byte, job interface{}) (err error) {
-	req, err := http.NewRequest("POST", sc.siadurl, bytes.NewReader(header))
+//SubmitHeader reports a solved header to the sentient daemon
+func (sc *SentientdClient) SubmitHeader(header []byte, job interface{}) (err error) {
+	req, err := http.NewRequest("POST", sc.sentientdurl, bytes.NewReader(header))
 	if err != nil {
 		return
 	}

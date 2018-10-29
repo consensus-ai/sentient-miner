@@ -1,7 +1,7 @@
 //Package clients provides some utilities and common code for specific client implementations
 package clients
 
-//HeaderReporter defines the required method a SIA client or pool client should implement for miners to be able to report solved headers
+//HeaderReporter defines the required method a sentient client or pool client should implement for miners to be able to report solved headers
 type HeaderReporter interface {
 	//SubmitHeader reports a solved header
 	SubmitHeader(header []byte, job interface{}) (err error)
@@ -11,7 +11,7 @@ type HeaderReporter interface {
 type HeaderProvider interface {
 	//GetHeaderForWork providers a header to mine on
 	// the deprecationChannel is closed when the job should be abandoned
-	GetHeaderForWork() (target, header []byte, deprecationChannel chan bool, job interface{}, err error)
+	GetHeaderForWork() (target []byte, header []byte, deprecationChannel chan bool, job interface{}, err error)
 }
 
 //DeprecatedJobCall is a function that can be registered on a client to be executed when
@@ -22,7 +22,7 @@ type DeprecatedJobCall func()
 type Client interface {
 	HeaderProvider
 	HeaderReporter
-	//Start connects to a sia daemon and starts supplying valid headers
+	//Start connects to a sentient daemon and starts supplying valid headers
 	// It can be empty in case of a "getwork" implementation or maintain a tcp connection in case of stratum for example
 	Start()
 	//SetDeprecatedJobCall sets the function to be called when the previous jobs should be abandoned

@@ -24,7 +24,7 @@ run = .
 pkgs = ./mining \
        ./clients \
        ./clients/stratum \
-       ./algorithms/sia \
+       ./algorithms/sentient \
        .
 
 # fmt calls go fmt on all packages.
