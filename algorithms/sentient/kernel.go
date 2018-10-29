@@ -4,14 +4,13 @@ const kernelSource = `
 
 inline static uint2 ror64(const uint2 x, const uint y)
 {
-    return (uint2)(((x).x>>y)^((x).y<<(32-y)),((x).y>>y)^((x).x<<(32-y)));
+	return (uint2)(((x).x>>y)^((x).y<<(32-y)),((x).y>>y)^((x).x<<(32-y)));
 }
 
 inline static uint2 ror64_2(const uint2 x, const uint y)
 {
-    return (uint2)(((x).y>>(y-32))^((x).x<<(64-y)),((x).x>>(y-32))^((x).y<<(64-y)));
+	return (uint2)(((x).y>>(y-32))^((x).x<<(64-y)),((x).x>>(y-32))^((x).y<<(64-y)));
 }
-
 
 __constant static const uchar blake2b_sigma[12][16] = {
 	{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15 } ,
@@ -27,10 +26,10 @@ __constant static const uchar blake2b_sigma[12][16] = {
 	{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15 } ,
 	{ 14, 10, 4,  8,  9,  15, 13, 6,  1,  12, 0,  2,  11, 7,  5,  3  } };
 
-// Target is passed in via headerIn[32 - 29]
+// Target is passed in via headerIn[32:40)
 __kernel void nonceGrind(__global ulong *headerIn, __global ulong *nonceOut) {
 	ulong target = headerIn[4];
-	ulong m[16] = {	headerIn[0], headerIn[1],
+	ulong m[16] = { headerIn[0], headerIn[1],
 	                headerIn[2], headerIn[3],
 	                (ulong)get_global_id(0), headerIn[5],
 	                headerIn[6], headerIn[7],
@@ -54,7 +53,7 @@ __kernel void nonceGrind(__global ulong *headerIn, __global ulong *nonceOut) {
     ((uint2*)&b)[0] = ror64_2( ((uint2*)&b)[0] ^ ((uint2*)&c)[0], 63U);
 
 
-#define ROUND(r)                    \
+#define ROUND(r)                  \
 	G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
 	G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
 	G(r,2,v[ 2],v[ 6],v[10],v[14]); \

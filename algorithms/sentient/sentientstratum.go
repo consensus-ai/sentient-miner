@@ -7,7 +7,6 @@ import (
 	"math/big"
 	"reflect"
 	"sync"
-	"time"
 
 	"golang.org/x/crypto/blake2b"
 

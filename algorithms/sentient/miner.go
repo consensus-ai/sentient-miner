@@ -83,6 +83,11 @@ func (m *Miner) createWork() {
 
 		//copy target to header
 		for i := 0; i < 8; i++ {
+			// Re: why not 32 bytes for target? Only the first 6 bytes of the target
+			// matter. The other 2 are a buffer. We won't need more than that unless
+			// the hashrate increases by about 100,000x the current hashrate.
+			// https://git.io/fx7bN
+			// XXX Being treated as little-endian for GPUs, what about CPU?
 			header[i+32] = target[7-i]
 		}
 		//Fill the workchannel with work
@@ -148,12 +153,13 @@ func (miner *singleDeviceMiner) mine() {
 
 	log.Println(miner.MinerID, "- Global item size:", miner.GlobalItemSize, "(Intensity", miner.Intensity, ")", "- Local item size:", localItemSize)
 
-	log.Println(miner.MinerID, "- Initialized ", miner.ClDevice.Type(), "-", miner.ClDevice.Name())
+	log.Println(miner.MinerID, "- Initialized", miner.ClDevice.Type(), "-", miner.ClDevice.Name())
 
 	nonceOut := make([]byte, 8, 8)
 	if _, err = commandQueue.EnqueueWriteBufferByte(nonceOutObj, true, 0, nonceOut, nil); err != nil {
 		log.Fatalln(miner.MinerID, "-", err)
 	}
+
 	for {
 		start := time.Now()
 		var work *miningWork
@@ -169,7 +175,9 @@ func (miner *singleDeviceMiner) mine() {
 			log.Println("Halting miner ", miner.MinerID)
 			break
 		}
+
 		//Copy input to kernel args
+		// log.Println("work.Target: ", work.Header[32:40])
 		if _, err = commandQueue.EnqueueWriteBufferByte(blockHeaderObj, true, 0, work.Header, nil); err != nil {
 			log.Fatalln(miner.MinerID, "-", err)
 		}
@@ -178,10 +186,12 @@ func (miner *singleDeviceMiner) mine() {
 		if _, err = commandQueue.EnqueueNDRangeKernel(kernel, []int{work.Offset}, []int{miner.GlobalItemSize}, []int{localItemSize}, nil); err != nil {
 			log.Fatalln(miner.MinerID, "-", err)
 		}
+
 		//Get output
 		if _, err = commandQueue.EnqueueReadBufferByte(nonceOutObj, true, 0, nonceOut, nil); err != nil {
 			log.Fatalln(miner.MinerID, "-", err)
 		}
+
 		//Check if match found
 		if nonceOut[0] != 0 || nonceOut[1] != 0 || nonceOut[2] != 0 || nonceOut[3] != 0 || nonceOut[4] != 0 || nonceOut[5] != 0 || nonceOut[6] != 0 || nonceOut[7] != 0 {
 			log.Println(miner.MinerID, "-", "Yay, solution found!")
