@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"sync"
 
-	"golang.org/x/crypto/blake2b"
+	// "golang.org/x/crypto/blake2b"
 
 	"github.com/consensus-ai/sentient-miner/clients"
 	"github.com/consensus-ai/sentient-miner/clients/stratum"
