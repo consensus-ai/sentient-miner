@@ -110,6 +110,7 @@ $GOPATH/bin/sentient-miner \
 ##### Prerequisites
 
 * go version 1.4.2 or above (I like to manage my go versions with [gvm](https://github.com/moovweb/gvm))
+* glide package manager ([install instructions](https://github.com/Masterminds/glide#install))
 * gcc and make (via build-essential on Ubuntu, and Xcode command line tools on Mac)
 
 ##### Build
@@ -136,14 +137,10 @@ $GOPATH/bin/sentient-miner
 
 ## Running
 
-```
-sentient-miner
-```
-
-Usage,
 ```shell
 sentient-miner --help
 ```
+
 ```
 Usage of sentient-miner:
   -E string
@@ -165,7 +162,7 @@ See what intensity gives you the best hashrate, increasing the intensity also in
 
 ##### Solo mining
 
-Start sentientd with the miner module enabled and start sentient-miner:
+Start sentientd with the miner module enabled and start sentient-miner,
 
 ```shell
 sentientd -M cghrtwm

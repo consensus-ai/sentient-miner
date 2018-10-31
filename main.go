@@ -27,7 +27,7 @@ func main() {
 	flag.IntVar(&intensity, "I", intensity, "Intensity")
 	host := flag.String("url", "localhost:9980", "daemon or server host and port, for stratum servers, use `stratum+tcp://<host>:<port>`")
 	pooluser := flag.String("user", "payoutaddress.rigname", "username, most stratum servers take this in the form [payoutaddress].[rigname]")
-	excludedGPUs := flag.String("E", "", "Exclude GPU's: comma separated list of devicenumbers")
+	excludedGPUs := flag.String("E", "", "Exclude GPU's: comma separated list of device numbers")
 	flag.Parse()
 
 	if *printVersion {

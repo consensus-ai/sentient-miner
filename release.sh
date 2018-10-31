@@ -18,11 +18,9 @@ else
   os="linux"
 fi
 
-# ensure we have a clean state
+# ensure we have a clean state, then build binary
 make clean
-rm -rf release
-
-# build binary
+make dependencies
 make release
 
 # create release
