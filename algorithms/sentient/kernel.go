@@ -35,7 +35,8 @@ __kernel void nonceGrind(__global ulong *headerIn, __global ulong *nonceOut) {
 	                headerIn[6], headerIn[7],
 	                headerIn[8], headerIn[9], 0, 0, 0, 0, 0, 0 };
 
-	ulong v[16] = { 0x6a09e667f2bdc928, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
+	// Constants pulled from https://git.io/fxb1Z
+	ulong v[16] = { 0x6a09e667f2bdc948, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
 	                0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
 	                0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
 	                0x510e527fade68281, 0x9b05688c2b3e6c1f, 0xe07c265404be4294, 0x5be0cd19137e2179 };
@@ -78,7 +79,7 @@ __kernel void nonceGrind(__global ulong *headerIn, __global ulong *nonceOut) {
 #undef G
 #undef ROUND
 
-	if (as_ulong(as_uchar8(0x6a09e667f2bdc928 ^ v[0] ^ v[8]).s76543210) <= target) {
+	if (as_ulong(as_uchar8(0x6a09e667f2bdc948 ^ v[0] ^ v[8]).s76543210) <= target) {
 		*nonceOut = m[4];
 		return;
 	}
