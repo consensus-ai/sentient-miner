@@ -305,16 +305,52 @@ func (sc *StratumClient) GetHeaderForWork() (target []byte, header []byte, depre
 //SubmitHeader reports a solution to the stratum server
 func (sc *StratumClient) SubmitHeader(header []byte, job interface{}) (err error) {
 	sj, _ := job.(stratumJob)
-	nonce := hex.EncodeToString(header[32:40])
+
 	encodedExtraNonce2 := hex.EncodeToString(sj.ExtraNonce2.Bytes())
 	nTime := hex.EncodeToString(sj.NTime)
+	nonce := hex.EncodeToString(header[32:40])
+
+	// sc.logSubmission(header, sj)
+
 	sc.mutex.Lock()
 	c := sc.stratumclient
 	sc.mutex.Unlock()
+
 	_, err = c.Call("mining.submit", []string{sc.User, sj.JobID, encodedExtraNonce2, nTime, nonce})
 	if err != nil {
 		return
 	}
 
 	return
+}
+
+func (sc *StratumClient) logSubmission(header []byte, sj stratumJob) {
+	encodedExtraNonce2 := hex.EncodeToString(sj.ExtraNonce2.Bytes())
+	nTime := hex.EncodeToString(sj.NTime)
+	nonce := hex.EncodeToString(header[32:40])
+
+	prevHash := hex.EncodeToString(header[:32])
+	encodedExtraNonce1 := hex.EncodeToString(sc.extranonce1)
+
+	merkleRoot := hex.EncodeToString(header[48:])
+	var branches []string
+	for _, h := range sc.currentJob.MerkleBranch {
+		branches = append(branches, hex.EncodeToString(h))
+	}
+	coinbase1 := hex.EncodeToString(sc.currentJob.Coinbase1)
+	coinbase2 := hex.EncodeToString(sc.currentJob.Coinbase2)
+	target := hex.EncodeToString(sc.target[:])
+
+	log.Println(
+		"Submitting header.",
+		"\n\tprevHash:", prevHash,
+		"\n\tnonce:", nonce,
+		"\n\textranonce1:", encodedExtraNonce1,
+		"\n\textranonce2:", encodedExtraNonce2,
+		"\n\tnTime:", nTime,
+		"\n\tmerkleRoot:", merkleRoot,
+		"\n\tmerkleBranches:", branches,
+		"\n\tcoinbase1:", coinbase1,
+		"\n\tcoinbase2:", coinbase2,
+		"\n\ttarget:", target)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/consensus-ai/sentient-miner/mining"
 )
 
-//miningWork is sent to the mining routines and defines what ranges should be searched for a matching nonce
+// miningWork is sent to the mining routines and defines what ranges should be searched for a matching nonce
 type miningWork struct {
 	Header []byte
 	Offset int
@@ -27,7 +27,7 @@ type Miner struct {
 	Client         clients.Client
 }
 
-//singleDeviceMiner actually mines on 1 opencl device
+// singleDeviceMiner actually mines on 1 opencl device
 type singleDeviceMiner struct {
 	ClDevice          *cl.Device
 	MinerID           int
