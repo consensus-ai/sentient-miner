@@ -17,13 +17,13 @@ import (
 //Version is the released version string of sentient-miner
 var Version = "0.6.2-Dev"
 
-var intensity = 28
-var devicesTypesForMining = cl.DeviceTypeGPU
+var intensity = 16
+var devicesTypesForMining = cl.DeviceTypeAll
 
 func main() {
 	log.SetOutput(os.Stdout)
 	printVersion := flag.Bool("v", false, "Show version and exit")
-	useCPU := flag.Bool("cpu", false, "If set, also use the CPU for mining, only GPU's are used by default")
+	noCPU := flag.Bool("npcpu", false, "If set, don't use the  for mining. Uses all devices by default")
 	flag.IntVar(&intensity, "I", intensity, "Intensity")
 	host := flag.String("url", "localhost:9980", "daemon or server host and port, for stratum servers, use `stratum+tcp://<host>:<port>`")
 	pooluser := flag.String("user", "payoutaddress.rigname", "username, most stratum servers take this in the form [payoutaddress].[rigname]")
@@ -35,8 +35,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *useCPU {
-		devicesTypesForMining = cl.DeviceTypeAll
+	if *noCPU {
+		devicesTypesForMining = cl.DeviceTypeGPU
 	}
 	globalItemSize := int(math.Exp2(float64(intensity)))
 
@@ -77,7 +77,7 @@ func main() {
 	var hashRateReportsChannel = make(chan *mining.HashRateReport, nrOfMiningDevices*10)
 
 	var miner mining.Miner
-	log.Println("Starting sentent mining")
+	log.Println("Starting sentient mining")
 	c := sentient.NewClient(*host, *pooluser)
 
 	miner = &sentient.Miner{
