@@ -142,15 +142,16 @@ sentient-miner
 
 Usage,
 ```shell
-$ sentient-miner --help
-
+sentient-miner --help
+```
+```
 Usage of sentient-miner:
   -E string
     	Exclude GPU's: comma separated list of devicenumbers
   -I int
     	Intensity (default 16)
   -npcpu
-    	If set, don't use the  for mining. Uses all devices by default
+    	If set, don't use the CPU for mining. Uses all devices by default
   -url stratum+tcp://<host>:<port>
     	daemon or server host and port, for stratum servers, use stratum+tcp://<host>:<port> (default "localhost:9980")
   -user string
