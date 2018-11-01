@@ -49,7 +49,7 @@ release:
 # clean removes all directories that get automatically created during
 # development.
 clean:
-	rm -rf release && go clean -testcache
+	rm -rf release && go clean -testcache && go clean -i github.com/consensus-ai/sentient-miner
 
 test:
 	go test -v -short -tags='debug testing netgo' -timeout=15s $(pkgs) -run=$(run)

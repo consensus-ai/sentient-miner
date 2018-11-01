@@ -97,6 +97,7 @@ make dependencies
 
 # To compile project source
 make dev
+# make release
 
 # To run built binary
 $GOPATH/bin/sentient-miner \
@@ -122,8 +123,12 @@ mkdir -p src/github.com/consensus-ai/
 cd src/github.com/consensus-ai/
 ln -s ~/src/sentient-miner .
 
+# To compile dependencies (only need to do if dependencies change)
 make dependencies
+
+# To compile project source
 make dev
+# make release
 
 # To run built binary
 $GOPATH/bin/sentient-miner
