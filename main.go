@@ -14,8 +14,8 @@ import (
 	"github.com/consensus-ai/sentient-miner/mining"
 )
 
-//Version is the released version string of sentient-miner
-var Version = "0.6.2-Dev"
+// Version is the released version string of sentient-miner
+var Version = "v0.1.0"
 
 var intensity = 16
 var devicesTypesForMining = cl.DeviceTypeAll
