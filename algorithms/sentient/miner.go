@@ -164,13 +164,7 @@ func (miner *singleDeviceMiner) mine() {
 		start := time.Now()
 		var work *miningWork
 		continueMining := true
-		select {
-		case work, continueMining = <-miner.miningWorkChannel:
-		default:
-			log.Println(miner.MinerID, "-", "No work ready")
-			work, continueMining = <-miner.miningWorkChannel
-			log.Println(miner.MinerID, "-", "Continuing")
-		}
+		work, continueMining = <-miner.miningWorkChannel
 		if !continueMining {
 			log.Println("Halting miner ", miner.MinerID)
 			break
@@ -194,7 +188,7 @@ func (miner *singleDeviceMiner) mine() {
 
 		//Check if match found
 		if nonceOut[0] != 0 || nonceOut[1] != 0 || nonceOut[2] != 0 || nonceOut[3] != 0 || nonceOut[4] != 0 || nonceOut[5] != 0 || nonceOut[6] != 0 || nonceOut[7] != 0 {
-			log.Println(miner.MinerID, "-", "Yay, solution found!")
+			log.Println(miner.MinerID, "-", "Solution found!")
 
 			// Copy nonce to a new header.
 			header := append([]byte(nil), work.Header...)
