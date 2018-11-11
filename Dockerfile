@@ -7,8 +7,7 @@ RUN groupadd -g 999 $USER && useradd -mr -u 999 -g $USER $USER
 
 ARG GOLANG_VERSION=1.10.4
 
-RUN DEBIAN_FRONTEND=noninteractive \
-  apt-get update && \
+RUN apt-get update && \
   apt-get install --no-install-recommends -y -q \
     curl \
     build-essential \
