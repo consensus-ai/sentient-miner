@@ -23,7 +23,7 @@ var devicesTypesForMining = cl.DeviceTypeAll
 func main() {
 	log.SetOutput(os.Stdout)
 	printVersion := flag.Bool("v", false, "Show version and exit")
-	noCPU := flag.Bool("npcpu", false, "If set, don't use the CPU for mining. Uses all devices by default")
+	noCPU := flag.Bool("nocpu", false, "If set, don't use the CPU for mining. Uses all devices by default")
 	flag.IntVar(&intensity, "I", intensity, "Intensity")
 	host := flag.String("url", "localhost:9910", "daemon or server host and port, for stratum servers, use `stratum+tcp://<host>:<port>`")
 	pooluser := flag.String("user", "payoutaddress.rigname", "username, most stratum servers take this in the form [payoutaddress].[rigname]")

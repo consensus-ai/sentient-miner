@@ -144,13 +144,13 @@ sentient-miner --help
 ```
 Usage of sentient-miner:
   -E string
-    	Exclude GPU's: comma separated list of devicenumbers
+    	Exclude GPU's: comma separated list of device numbers
   -I int
     	Intensity (default 16)
-  -npcpu
+  -nocpu
     	If set, don't use the CPU for mining. Uses all devices by default
   -url stratum+tcp://<host>:<port>
-    	daemon or server host and port, for stratum servers, use stratum+tcp://<host>:<port> (default "localhost:9980")
+    	daemon or server host and port, for stratum servers, use stratum+tcp://<host>:<port> (default "localhost:9910")
   -user string
     	username, most stratum servers take this in the form [payoutaddress].[rigname] (default "payoutaddress.rigname")
   -v	Show version and exit
