@@ -56,7 +56,7 @@ OpenCL should already be installed. Nothing to do.
 
 #### Binary releases
 
-Binaries for Windows and Linux are available in the [corresponding releases](https://github.com/consensus-ai/sentient-miner/releases).
+Binaries for MacOS and Linux are available in the [corresponding releases](https://github.com/consensus-ai/sentient-miner/releases).
 
 #### Build from source (with Docker)
 
