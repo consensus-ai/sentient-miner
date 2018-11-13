@@ -10,7 +10,7 @@ fi
 
 privkeyFile=$1
 pubkeyFile=$2
-version=${3:-v0.0.1}
+version=$3
 
 if [ `uname -s` = Darwin ]; then
   os="osx"
@@ -18,16 +18,13 @@ else
   os="linux"
 fi
 
-# ensure we have a clean state
+# ensure we have a clean state, then build binary
 make clean
-rm -rf release
-
-# build binary
-make
+make dependencies
+make release
 
 # create release
 compiledBinary="sentient-miner"
-kernelFile="sentient-miner.cl"
 binarySuffix="${version}-${os}-amd64"
 binaryName="${compiledBinary}-${binarySuffix}"
 zipFile="${binaryName}.zip"
@@ -36,15 +33,10 @@ mkdir release
 
 (
   cd release
-  cp ../$compiledBinary $binaryName
-
-  # NOTE: we have to include the CL kernel as it's being read into the executable at runtime.
-  # Eventually we could switch this to Go, or C++ where we can make use of raw string imports
-  # to statically read the file into the binary at compile time.
-  cp ../$kernelFile .
+  cp $GOPATH/bin/$compiledBinary $binaryName
 
   chmod +x $binaryName
-  zip -r $zipFile $binaryName $kernelFile
+  zip -r $zipFile $binaryName
 
   openssl dgst -sha256 -sign $privkeyFile -out $zipFile.sig $zipFile
   if [[ -n $pubkeyFile ]]; then

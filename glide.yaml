@@ -1,0 +1,6 @@
+package: github.com/consensus-ai/sentient-miner
+import:
+- package: github.com/robvanmieghem/go-opencl
+- package: golang.org/x/crypto
+  subpackages:
+  - blake2b

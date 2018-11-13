@@ -1,26 +1,27 @@
 # Sentient-Miner
-A GPU miner designed for mining SEN. This miner runs in a command prompt
-and prints your hashrate along side the number of blocks you've mined. Most
-cards will see greatly increased hashrates by increasing the value of 'I'
-(default is 16, optimal is typically 20-25). Be careful with adjusting this parameter as it may crash the miner, or freeze the output.
 
-## Install dependencies (ubuntu 16.04)
+GPU and CPU miner for mining SEN. This miner runs in a command prompt and prints your hashrate along side the number of blocks you've mined. Most cards will see greatly increased hashrates by increasing the value of 'I' (default is 16, optimal is typically 20-25). Be careful with adjusting this parameter as it may crash the miner, or freeze the output. All available OpenCL-capable devices are detected and used in parallel.
 
-#### On ubuntu 16.04
-```bash
+
+## Install common dependencies (Ubuntu 16.04)
+
+#### On Ubuntu 16.04
+
+```shell
 sudo apt-get install -y ocl-icd-libopencl1 opencl-headers clinfo libcurl4-gnutls-dev
 sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
 
-# check OpenCL platforms
+# Check OpenCL platforms
 clinfo
 ```
 
 #### On AWS, p2 instance
+
 Install NVIDIA drivers first, using the guide here: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html
 
-E.g. at the time of writing, these are the steps that worked (double check the version strings when you run this, in case there's a newer version available):
+E.g. at the time of writing, these are the steps that worked (double check the version strings when you run this, in case there's a newer version available),
 
-```bash
+```shell
 sudo apt-get update -y
 sudo apt-get upgrade -y linux-aws
 sudo reboot
@@ -36,19 +37,14 @@ sudo reboot
 nvidia-smi -q | head
 ```
 
-Optionally, follow the optimization steps here:
-https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/optimize_gpu.html
+Optionally, follow these [optimization steps](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/optimize_gpu.html). Here's what worked at the time of writing,
 
-Here's what worked at the time of writing this:
-
-```bash
+```shell
 nvidia-persistenced
 nvidia-smi --auto-boost-default=0
 nvidia-smi -ac 2505,875
-```
 
-You might also be interested in seeing what the current clock speeds are set to:
-```bash
+# You might also be interested in seeing what the current clock speeds are set to:
 nvidia-smi  -q -i 0 -d CLOCK
 ```
 
@@ -56,48 +52,131 @@ nvidia-smi  -q -i 0 -d CLOCK
 
 OpenCL should already be installed. Nothing to do.
 
-## How to Use
-1) Build the miner by running `make`.
+## Building project
 
-2) Make sure you have a recent version of `sentientd` installed and running.
+#### Binary releases
 
-3) Run the miner by running `./sentient-miner`. It will mine blocks until killed with Ctrl-C.
+Binaries for Windows and Linux are available in the [corresponding releases](https://github.com/consensus-ai/sentient-miner/releases).
 
-## Configuration
-You can tweak the miner settings with five command-line arguments: `-I`, `-C`, `-p`, `-d`, and `-P`.
-* -I controls the intensity. On each GPU call, the GPU will do 2^I hashes. The
-  default value is low to prevent certain GPUs from crashing immediately at
-  startup. Most cards will benefit substantially from increasing the value. The
-  default is 16, but recommended (for most cards) is 20-25.
-* -C controls how frequently calls to sentientd are made. Reducing it substantially
-  could cause instability to the miner. Increasing it will reduce the frequency
-  at which the hashrate is updated. If a low 'I' is being used, a high 'C'
-  should be used. As a rule of thumb, the hashrate should only be updating a
-  few times per second. The default is 30.
-* -p allows you to pick a platform. Default is the first platform (indexing
-  from 0).
-* -d allows you to pick which device to copmute on. Default is the first device
-  (indexing from 0).
-* -P changes the port that the miner makes API calls to. Use this if you
-  configured Sentient to be on a port other than the default. Default is 9910.
+#### Build from source (with Docker)
 
-If you wanted to run the program on platform 0, device 1, with an intensity of
-24, you would call `./sentient-miner -d 1 -I 24`
+This build procedure expects the host to be using NVIDIA GPUs to run w/ GPU support (via the [NVIDIA Container Runtime for Docker](https://github.com/NVIDIA/nvidia-docker)). If this is doesn't meet the constraints for your system (e.x. you're running an AMD GPU) you don't have to use docker to build source.
 
-## Multiple GPUs
-Each instance of the miner can only point to a single GPU. To mine on multiple
-GPUs at the same time, you will need to run multiple instances of the miner and
-point each at a different gpu. Only one instance of 'sentientd' needs to be running,
-all of the miners can point to it.
+##### Prerequisites
 
-It is highly recommended that you greatly increase the value of 'C' when using
-multiple miners. As a rule of thumb, the hashrate for each miner should be
-updating one time per [numGPUs] seconds. You should not mine with more than 6
-cards at a time (per instance of sentientd).
+* Docker ([install instructions](https://docs.docker.com/install/))
+* NVIDIA PU drivers on host machine (e.x. [how to install on Amazon EC2 instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html))
 
-## Notes
-*    Each Sen block takes about 10 minutes to mine.
-*    Once a block is mined, Sentient waits for 144 confirmation blocks before the
-	 reward is added to your wallet, which takes about 24 hours.
-*    Sentient currently doesn't have any mining pools.
-*    Windows is poorly supported. For best results, use Linux when mining.
+##### Build
+
+```shell
+git clone git@github.com:consensus-ai/sentient-miner.git
+cd sentient-miner
+docker build . -t sentient-miner
+
+# To run built binary
+docker run -it --rm --runtime=nvidia sentient-miner \
+  /home/appuser/go/bin/sentient-miner \
+  -url stratum+tcp://pool.sentient.org:3333 \
+  -user 269409be5afc296549bbf5f0831e31d50ef3510b82cde37194af5867fc8f084292576e8dad85.julian
+```
+
+For development I like to run,
+
+```shell
+docker run -it --rm --runtime=nvidia sentient-miner \
+  -v ../sentient-miner:/home/appuser/go/src/github.com/consensus-ai/sentient-miner:rw,z \
+  bash
+```
+
+Then, once in the container, use `make`,
+
+```shell
+# To compile dependencies (only need to do if dependencies change)
+make dependencies
+
+# To compile project source
+make dev
+# make release
+
+# To run built binary
+$GOPATH/bin/sentient-miner \
+  -url stratum+tcp://pool.sentient.org:3333 \
+  -user 269409be5afc296549bbf5f0831e31d50ef3510b82cde37194af5867fc8f084292576e8dad85.julian
+```
+
+#### Build from source (without Docker)
+
+##### Prerequisites
+
+* go version 1.4.2 or above (I like to manage my go versions with [gvm](https://github.com/moovweb/gvm))
+* glide package manager ([install instructions](https://github.com/Masterminds/glide#install))
+* gcc and make (via build-essential on Ubuntu, and Xcode command line tools on Mac)
+
+##### Build
+
+```shell
+git clone git@github.com:consensus-ai/sentient-miner.git ~/src/sentient-miner
+
+cd $GOPATH
+mkdir -p src/github.com/consensus-ai/
+
+cd src/github.com/consensus-ai/
+ln -s ~/src/sentient-miner .
+
+# To compile dependencies (only need to do if dependencies change)
+make dependencies
+
+# To compile project source
+make dev
+# make release
+
+# To run built binary
+$GOPATH/bin/sentient-miner
+```
+
+## Running
+
+```shell
+sentient-miner --help
+```
+
+```
+Usage of sentient-miner:
+  -E string
+    	Exclude GPU's: comma separated list of device numbers
+  -I int
+    	Intensity (default 16)
+  -nocpu
+    	If set, don't use the CPU for mining. Uses all devices by default
+  -url stratum+tcp://<host>:<port>
+    	daemon or server host and port, for stratum servers, use stratum+tcp://<host>:<port> (default "localhost:9910")
+  -user string
+    	username, most stratum servers take this in the form [payoutaddress].[rigname] (default "payoutaddress.rigname")
+  -v	Show version and exit
+```
+
+See what intensity gives you the best hashrate, increasing the intensity also increases the stale rate though.
+
+## Examples
+
+##### Solo mining
+
+Start sentientd with the miner module enabled and start sentient-miner,
+
+```shell
+sentientd -M cghrtwm
+sentient-miner
+```
+
+##### Pool mining (via Stratum)
+
+```shell
+sentient-miner \
+  -url stratum+tcp://pool.sentient.org:3333 \
+  -user 269409be5afc296549bbf5f0831e31d50ef3510b82cde37194af5867fc8f084292576e8dad85.julian
+```
+
+## Stratum support
+
+Stratum support is implemented as defined on https://pool.sentient.org/stratum.

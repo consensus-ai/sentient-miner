@@ -1,0 +1,16 @@
+hash: 8080c3aea1285ba51c810993abeea1e9ca03769139a54c4ad34876d7c6c05820
+updated: 2018-10-27T04:31:23.7581048Z
+imports:
+- name: github.com/robvanmieghem/go-opencl
+  version: 5ca28f1a8220f79ffacbaa12e4dff1628b708307
+  subpackages:
+  - cl
+- name: golang.org/x/crypto
+  version: e84da0312774c21d64ee2317962ef669b27ffb41
+  subpackages:
+  - blake2b
+- name: golang.org/x/sys
+  version: 95b1ffbd15a57cc5abb3f04402b9e8ec0016a52c
+  subpackages:
+  - cpu
+testImports: []
