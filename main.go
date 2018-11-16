@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	zmq "github.com/pebbe/zmq4"
 	"github.com/robvanmieghem/go-opencl/cl"
 	"github.com/consensus-ai/sentient-miner/algorithms/sentient"
 	"github.com/consensus-ai/sentient-miner/mining"
@@ -89,22 +90,57 @@ func main() {
 	}
 	miner.Mine()
 
+	socket, err := zmq.NewSocket(zmq.PUB)
+	if err != nil {
+		log.Println("Unable to create zmq socket for publishing hashrates")
+	}
+	defer socket.Close()
+
+	socketEndpoint, ok := os.LookupEnv("SENTIENT_MINER_CURRENT_HASHRATE_ENDPOINT")
+	if !ok {
+		socketEndpoint = "tcp://127.0.0.1:5555"
+	}
+	hashRatesSocketFrequency := 1 // 1 second
+	if socketFrequencyStr, ok := os.LookupEnv("SENTIENT_MINER_CURRENT_HASHRATE_FREQUENCY"); ok {
+		if i64, err := strconv.ParseInt(socketFrequencyStr, 10, 32); err == nil {
+			hashRatesSocketFrequency = int(i64)
+		}
+	}
+	hashRatesLogPath, ok := os.LookupEnv("SENTIENT_MINER_HASHRATES_LOG_PATH")
+	if !ok {
+		hashRatesLogPath = "./hashrates.log"
+	}
+	hashRatesLogFrequency := 10 * 60 // 10 minutes
+	if logFrequencyStr, ok := os.LookupEnv("SENTIENT_MINER_HASHRATES_LOG_FREQUENCY"); ok {
+		if i64, err := strconv.ParseInt(logFrequencyStr, 10, 32); err == nil {
+			hashRatesLogFrequency = int(i64)
+		}
+	}
+	maxLogLines := 10000
+	if maxLogLinesStr, ok := os.LookupEnv("SENTIENT_MINER_HASHRATES_LOG_MAX_LINES"); ok {
+		if i64, err := strconv.ParseInt(maxLogLinesStr, 10, 32); err == nil {
+			maxLogLines = int(i64)
+		}
+	}
+
+	socket.Bind(socketEndpoint)
+	socket.SetLinger(0)
+	stdOutSink := mining.NewHashRateStdOutSink()
+	socketSink := mining.NewHashRateSocketSink(socket, hashRatesSocketFrequency)
+	loggerSink := mining.NewHashRateLoggerSink(hashRatesLogPath, hashRatesLogFrequency, maxLogLines)
+
 	//Start printing out the hashrates of the different gpu's
-	hashRateReports := make([]float64, nrOfMiningDevices)
+	hashRateReports := make(map[int]float64)
 	for {
 		//No need to print at every hashreport, we have time
 		for i := 0; i < nrOfMiningDevices; i++ {
 			report := <-hashRateReportsChannel
 			hashRateReports[report.MinerID] = report.HashRate
 		}
-		fmt.Print("\r")
-		var totalHashRate float64
-		for minerID, hashrate := range hashRateReports {
-			fmt.Printf("%d-%.1f ", minerID, hashrate)
-			totalHashRate += hashrate
-		}
-		fmt.Printf("Total: %.1f MH/s  ", totalHashRate)
 
+		stdOutSink.SetCurrentHashRates(hashRateReports)
+		socketSink.SetCurrentHashRates(hashRateReports)
+		loggerSink.SetCurrentHashRates(hashRateReports)
 	}
 }
 
