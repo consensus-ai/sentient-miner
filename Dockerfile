@@ -10,6 +10,8 @@ ARG GOLANG_VERSION=1.10.4
 RUN apt-get update && \
   apt-get install --no-install-recommends -y -q \
     curl \
+    pkg-config \
+    libzmq3-dev \
     build-essential \
     ca-certificates \
     git

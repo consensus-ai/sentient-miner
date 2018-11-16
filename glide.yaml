@@ -4,3 +4,5 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - blake2b
+- package: github.com/pebbe/zmq4
+- package: github.com/natefinch/atomic
