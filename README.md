@@ -2,7 +2,6 @@
 
 GPU and CPU miner for mining SEN. This miner runs in a command prompt and prints your hashrate along side the number of blocks you've mined. Most cards will see greatly increased hashrates by increasing the value of 'I' (default is 16, optimal is typically 20-25). Be careful with adjusting this parameter as it may crash the miner, or freeze the output. All available OpenCL-capable devices are detected and used in parallel.
 
-
 ## Install common dependencies (Ubuntu 16.04)
 
 #### On Ubuntu 16.04
@@ -54,18 +53,23 @@ OpenCL should already be installed. Nothing to do.
 
 ## Building project
 
-#### Binary releases
+##### Prerequisites
+
+* [ZeroMQ](http://zeromq.org/intro:get-the-software)
+* Drivers for your GPU
+
+### Binary releases
 
 Binaries for MacOS and Linux are available in the [corresponding releases](https://github.com/consensus-ai/sentient-miner/releases).
 
-#### Build from source (with Docker)
+### Build from source (with Docker)
 
-This build procedure expects the host to be using NVIDIA GPUs to run w/ GPU support (via the [NVIDIA Container Runtime for Docker](https://github.com/NVIDIA/nvidia-docker)). If this is doesn't meet the constraints for your system (e.x. you're running an AMD GPU) you don't have to use docker to build source.
+This build procedure expects the host to be using NVIDIA GPUs to run w/ GPU support (via the [NVIDIA Container Runtime for Docker](https://github.com/NVIDIA/nvidia-docker)). _If this is doesn't meet the constraints for your system (e.x. you're running an AMD GPU) you don't have to use docker to build source._
 
-##### Prerequisites
+##### Additional Prerequisites
 
 * Docker ([install instructions](https://docs.docker.com/install/))
-* NVIDIA PU drivers on host machine (e.x. [how to install on Amazon EC2 instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html))
+* NVIDIA GPU drivers on host machine (e.x. [how to install on Amazon EC2 instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html))
 
 ##### Build
 
@@ -105,9 +109,9 @@ $GOPATH/bin/sentient-miner \
   -user 269409be5afc296549bbf5f0831e31d50ef3510b82cde37194af5867fc8f084292576e8dad85.julian
 ```
 
-#### Build from source (without Docker)
+### Build from source (without Docker)
 
-##### Prerequisites
+##### Additional Prerequisites
 
 * go version 1.4.2 or above (I like to manage my go versions with [gvm](https://github.com/moovweb/gvm))
 * glide package manager ([install instructions](https://github.com/Masterminds/glide#install))

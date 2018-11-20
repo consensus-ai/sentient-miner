@@ -1,4 +1,3 @@
-# FROM ubuntu:14.04
 FROM pkienzle/opencl_docker
 MAINTAINER Julian Villella <julian@objectspace.io>
 
@@ -10,6 +9,8 @@ ARG GOLANG_VERSION=1.10.4
 RUN apt-get update && \
   apt-get install --no-install-recommends -y -q \
     curl \
+    pkg-config \
+    libzmq3-dev \
     build-essential \
     ca-certificates \
     git
@@ -33,6 +34,7 @@ RUN chown -R $USER:$USER $GOPATH
 
 USER $USER
 
+RUN make clean
 RUN make dependencies
 # RUN make dev
 RUN make release

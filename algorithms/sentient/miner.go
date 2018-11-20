@@ -53,8 +53,8 @@ func (m *Miner) Mine() {
 			GlobalItemSize:    m.GlobalItemSize,
 			Client:            m.Client,
 		}
-		go sdm.mine()
 
+		go sdm.mine()
 	}
 }
 
