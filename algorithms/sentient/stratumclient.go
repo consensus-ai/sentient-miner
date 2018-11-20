@@ -56,6 +56,7 @@ func (sc *StratumClient) Start() {
 		sc.mutex.Unlock()
 	}()
 
+	sc.currentJob.JobID = ""
 	sc.DeprecateOutstandingJobs()
 
 	sc.stratumclient = &stratum.Client{}
