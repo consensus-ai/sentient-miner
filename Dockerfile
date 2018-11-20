@@ -1,4 +1,3 @@
-# FROM ubuntu:14.04
 FROM pkienzle/opencl_docker
 MAINTAINER Julian Villella <julian@objectspace.io>
 
@@ -35,6 +34,7 @@ RUN chown -R $USER:$USER $GOPATH
 
 USER $USER
 
+RUN make clean
 RUN make dependencies
 # RUN make dev
 RUN make release
