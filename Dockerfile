@@ -31,6 +31,7 @@ WORKDIR $GOPATH/src/github.com/consensus-ai/sentient-miner
 
 COPY . .
 RUN chown -R $USER:$USER $GOPATH
+RUN chmod g+s $GOPATH
 
 USER $USER
 

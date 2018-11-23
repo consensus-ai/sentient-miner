@@ -6,3 +6,4 @@ import:
   - blake2b
 - package: github.com/pebbe/zmq4
 - package: github.com/natefinch/atomic
+- package: github.com/google/go-cmp/cmp
