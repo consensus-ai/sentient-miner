@@ -7,6 +7,8 @@ import (
 	"math/big"
 	"reflect"
 	"sync"
+	"time"
+	"fmt"
 
 	// "golang.org/x/crypto/blake2b"
 	"github.com/google/go-cmp/cmp"
@@ -40,6 +42,7 @@ type stratumJob struct {
 type StratumClient struct {
 	connectionstring string
 	User             string
+	Version          string
 
 	mutex           sync.Mutex // protects following
 	stratumclient   *stratum.Client
@@ -65,6 +68,7 @@ func (sc *StratumClient) Start() {
 	sc.stratumclient.ErrorCallback = func(err error) {
 		log.Println("Error in connection to stratumserver:", err)
 		sc.stratumclient.Close()
+		time.Sleep(5 * time.Second)
 		sc.Start()
 	}
 
@@ -77,7 +81,7 @@ func (sc *StratumClient) Start() {
 
 	//Subscribe for mining
 	//Close the connection on an error will cause the client to generate an error, resulting in te errorhandler to be triggered
-	result, err := sc.stratumclient.Call("mining.subscribe", []string{"sentient-miner"})
+	result, err := sc.stratumclient.Call("mining.subscribe", []string{fmt.Sprintf("sentient-miner/%d", sc.Version)})
 	if err != nil {
 		log.Println("ERROR Error in response from stratum:", err)
 		sc.stratumclient.Close()

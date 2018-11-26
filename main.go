@@ -16,7 +16,7 @@ import (
 )
 
 // Version is the released version string of sentient-miner
-var Version = "v0.1.1"
+var Version = "v0.1.2"
 
 var intensity = 16
 var devicesTypesForMining = cl.DeviceTypeAll
@@ -79,7 +79,7 @@ func main() {
 
 	var miner mining.Miner
 	log.Println("Starting sentient mining")
-	c := sentient.NewClient(*host, *pooluser)
+	c := sentient.NewClient(*host, *pooluser, Version)
 
 	miner = &sentient.Miner{
 		ClDevices:       miningDevices,
