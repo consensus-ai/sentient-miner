@@ -55,10 +55,13 @@ OpenCL should already be installed. Nothing to do.
 
 ##### Prerequisites
 
-* [ZeroMQ](http://zeromq.org/intro:get-the-software)
 * Drivers for your GPU
 
 ### Binary releases
+
+##### Additional Prerequisites
+
+* ZeroMQ 4.2 ([install instructions](http://zeromq.org/intro:get-the-software), [ubuntu](https://askubuntu.com/questions/918140/how-to-install-0mq-on-ubuntu-16-04/928188#928188))
 
 Binaries for MacOS and Linux are available in the [corresponding releases](https://github.com/consensus-ai/sentient-miner/releases).
 
@@ -111,29 +114,41 @@ $GOPATH/bin/sentient-miner \
 
 ### Build from source (without Docker)
 
-##### Additional Prerequisites
+##### Optional Prerequisites
+
+- go version manager ([gvm project page](https://github.com/moovweb/gvm))
+
+##### Additional Required Prerequisites
 
 * go version 1.4.2 or above (I like to manage my go versions with [gvm](https://github.com/moovweb/gvm))
 * glide package manager ([install instructions](https://github.com/Masterminds/glide#install))
 * gcc and make (via build-essential on Ubuntu, and Xcode command line tools on Mac)
+* ZeroMQ 4.2 ([install instructions](http://zeromq.org/intro:get-the-software), [ubuntu](https://askubuntu.com/questions/918140/how-to-install-0mq-on-ubuntu-16-04/928188#928188))
+* `sudo apt-get install pkg-config` on Ubuntu
 
 ##### Build
 
 ```shell
+# If using gvm
+gvm install go1.11 --prefer-binary
+gvm use go1.11
+
+mkdir ~/src
 git clone git@github.com:consensus-ai/sentient-miner.git ~/src/sentient-miner
 
 cd $GOPATH
 mkdir -p src/github.com/consensus-ai/
 
-cd src/github.com/consensus-ai/
+cd $GOPATH/src/github.com/consensus-ai/
 ln -s ~/src/sentient-miner .
+cd $GOPATH/src/github.com/consensus-ai/sentient-miner
 
 # To compile dependencies (only need to do if dependencies change)
 make dependencies
 
 # To compile project source
-make dev
-# make release
+# make dev
+make release
 
 # To run built binary
 $GOPATH/bin/sentient-miner
