@@ -7,8 +7,11 @@ import (
 	"math/big"
 	"reflect"
 	"sync"
+	"time"
+	"fmt"
 
 	// "golang.org/x/crypto/blake2b"
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/consensus-ai/sentient-miner/clients"
 	"github.com/consensus-ai/sentient-miner/clients/stratum"
@@ -39,6 +42,7 @@ type stratumJob struct {
 type StratumClient struct {
 	connectionstring string
 	User             string
+	Version          string
 
 	mutex           sync.Mutex // protects following
 	stratumclient   *stratum.Client
@@ -64,6 +68,7 @@ func (sc *StratumClient) Start() {
 	sc.stratumclient.ErrorCallback = func(err error) {
 		log.Println("Error in connection to stratumserver:", err)
 		sc.stratumclient.Close()
+		time.Sleep(5 * time.Second)
 		sc.Start()
 	}
 
@@ -76,7 +81,7 @@ func (sc *StratumClient) Start() {
 
 	//Subscribe for mining
 	//Close the connection on an error will cause the client to generate an error, resulting in te errorhandler to be triggered
-	result, err := sc.stratumclient.Call("mining.subscribe", []string{"sentient-miner"})
+	result, err := sc.stratumclient.Call("mining.subscribe", []string{fmt.Sprintf("sentient-miner/%d", sc.Version)})
 	if err != nil {
 		log.Println("ERROR Error in response from stratum:", err)
 		sc.stratumclient.Close()
@@ -201,7 +206,25 @@ func (sc *StratumClient) subscribeToStratumJobNotifications() {
 func (sc *StratumClient) addNewStratumJob(sj stratumJob) {
 	sc.mutex.Lock()
 	defer sc.mutex.Unlock()
+
+	if (
+		cmp.Equal(sc.currentJob.PrevHash,     sj.PrevHash)     &&
+		cmp.Equal(sc.currentJob.Coinbase1,    sj.Coinbase1)    &&
+		cmp.Equal(sc.currentJob.Coinbase2,    sj.Coinbase2)    &&
+		cmp.Equal(sc.currentJob.MerkleBranch, sj.MerkleBranch) &&
+		cmp.Equal(sc.currentJob.Version,      sj.Version)      &&
+		cmp.Equal(sc.currentJob.NBits,        sj.NBits)        &&
+		cmp.Equal(sc.currentJob.NTime,        sj.NTime)) {
+		// If the job is actually different, only then reset the extranonce2
+		// otherwise we will be submitting duplicate shares.
+		sj.ExtraNonce2 = sc.currentJob.ExtraNonce2
+		// log.Println("Reusing extranonce2")
+	} else {
+		// log.Println("Resetting extranonce2")
+	}
+
 	sc.currentJob = sj
+
 	if sj.CleanJobs {
 		sc.DeprecateOutstandingJobs()
 	}

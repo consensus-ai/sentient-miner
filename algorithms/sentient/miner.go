@@ -16,7 +16,7 @@ type miningWork struct {
 	Job    interface{}
 }
 
-// Miner actually mines :-)
+// Miner actually mines
 type Miner struct {
 	ClDevices         map[int]*cl.Device
 	HashRateReports   chan *mining.HashRateReport
@@ -41,7 +41,6 @@ type singleDeviceMiner struct {
 
 //Mine spawns a seperate miner for each device defined in the CLDevices and feeds it with work
 func (m *Miner) Mine() {
-
 	m.miningWorkChannel = make(chan *miningWork, len(m.ClDevices))
 	go m.createWork()
 	for minerID, device := range m.ClDevices {
@@ -60,6 +59,7 @@ func (m *Miner) Mine() {
 
 const maxUint32 = int64(^uint32(0))
 
+// Enqueues nonces to check that the CLDevices split and work through
 func (m *Miner) createWork() {
 	//Register a function to clear the generated work if a job gets deprecated.
 	// It does not matter if we clear too many, it is worse to work on a stale job.
@@ -87,13 +87,13 @@ func (m *Miner) createWork() {
 			// matter. The other 2 are a buffer. We won't need more than that unless
 			// the hashrate increases by about 100,000x the current hashrate.
 			// https://git.io/fx7bN
-			// XXX Being treated as little-endian for GPUs, what about CPU?
 			header[i+32] = target[7-i]
 		}
+
 		//Fill the workchannel with work
 		// Only generate nonces for a 32 bit space (since gpu's are mostly 32 bit)
 	nonce32loop:
-		for i := int64(0); i*int64(m.GlobalItemSize) < (maxUint32 - int64(m.GlobalItemSize)); i++ {
+		for i := int64(0); i * int64(m.GlobalItemSize) < (maxUint32 - int64(m.GlobalItemSize)); i++ {
 			//Do not continue mining the 32 bit nonce space if the current job is deprecated
 			select {
 			case <-deprecationChannel:
@@ -152,7 +152,6 @@ func (miner *singleDeviceMiner) mine() {
 	}
 
 	log.Println(miner.MinerID, "- Global item size:", miner.GlobalItemSize, "(Intensity", miner.Intensity, ")", "- Local item size:", localItemSize)
-
 	log.Println(miner.MinerID, "- Initialized", miner.ClDevice.Type(), "-", miner.ClDevice.Name())
 
 	nonceOut := make([]byte, 8, 8)

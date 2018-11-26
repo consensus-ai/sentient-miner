@@ -1,6 +1,13 @@
-hash: 910e17c702a5a3c54d959893d8504dc7ad636d40d6ee64fb488d594720d1cee0
-updated: 2018-11-16T19:06:18.1931119Z
+hash: 778e58d31e7555eedc06161f24ca2d32cae6446d3cc5c5e7f9c1be740430e955
+updated: 2018-11-23T01:31:46.5215744Z
 imports:
+- name: github.com/google/go-cmp
+  version: 2248b49eaa8e1c8c0963ee77b40841adbc19d4ca
+  subpackages:
+  - cmp
+  - cmp/internal/diff
+  - cmp/internal/function
+  - cmp/internal/value
 - name: github.com/natefinch/atomic
   version: a62ce929ffcc871a51e98c6eba7b20321e3ed62d
 - name: github.com/pebbe/zmq4
@@ -14,7 +21,7 @@ imports:
   subpackages:
   - blake2b
 - name: golang.org/x/sys
-  version: 93218def8b18e66adbdab3eca8ec334700329f1f
+  version: 62eef0e2fa9b2c385f7b2778e763486da6880d37
   subpackages:
   - cpu
 testImports: []

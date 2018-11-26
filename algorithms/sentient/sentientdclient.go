@@ -12,9 +12,13 @@ import (
 )
 
 // NewClient creates a new SentientdClient given a '[stratum+tcp://]host:port' connectionstring
-func NewClient(connectionstring, pooluser string) (sc clients.Client) {
+func NewClient(connectionstring, pooluser string, version string) (sc clients.Client) {
 	if strings.HasPrefix(connectionstring, "stratum+tcp://") {
-		sc = &StratumClient{connectionstring: strings.TrimPrefix(connectionstring, "stratum+tcp://"), User: pooluser}
+		sc = &StratumClient{
+			connectionstring: strings.TrimPrefix(connectionstring, "stratum+tcp://"),
+			User: pooluser,
+			Version: version,
+		}
 	} else {
 		s := SentientdClient{}
 		s.sentientdurl = "http://" + connectionstring + "/miner/header"
