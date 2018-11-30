@@ -13,6 +13,7 @@ RUN apt-get update && \
     libzmq3-dev \
     build-essential \
     ca-certificates \
+    zip \
     git
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so

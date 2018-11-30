@@ -177,6 +177,24 @@ Usage of sentient-miner:
 
 See what intensity gives you the best hashrate, increasing the intensity also increases the stale rate though.
 
+## Release
+
+From your host machine,
+```bash
+gvm use go1.11 # If you're using GVM
+cd $GOPATH/src/github.com/consensus-ai/sentient-miner
+./release.sh $(pwd)/private.pem $(pwd)/public.pem <version-number>
+```
+
+Or through docker (e.x. to build Linux binary from macOS)
+```bash
+docker build -t sentient-miner .
+docker run -it --rm -v $(pwd)/:/home/appuser/go/src/github.com/consensus-ai/sentient-miner sentient-miner bash
+./release.sh $(pwd)/private.pem $(pwd)/public.pem <version-number>
+
+# Binaries will be on host machine under sentient-miner/release/
+```
+
 ## Examples
 
 ##### Solo mining
