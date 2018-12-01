@@ -16,7 +16,7 @@ import (
 )
 
 // Version is the released version string of sentient-miner
-var Version = "v0.1.2"
+var Version = "v0.1.1"
 
 var intensity = 16
 var devicesTypesForMining = cl.DeviceTypeAll
