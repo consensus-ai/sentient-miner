@@ -10,11 +10,24 @@ RUN apt-get update && \
   apt-get install --no-install-recommends -y -q \
     curl \
     pkg-config \
-    libzmq3-dev \
     build-essential \
     ca-certificates \
+    wget \
     zip \
+    libtool \
+    autoconf \
+    automake \
+    uuid-dev \
+    checkinstall \
     git
+
+RUN wget https://github.com/zeromq/libzmq/releases/download/v4.2.1/zeromq-4.2.1.tar.gz && \
+  tar -xvzf zeromq-4.2.1.tar.gz && \
+  cd zeromq-4.2.1 && \
+  ./configure && \
+  make && \
+  checkinstall && \
+  ldconfig
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
 
