@@ -8,6 +8,7 @@ import (
 	"time"
 	"bufio"
 	"net/http"
+	"encoding/json"
 
 	"github.com/gorilla/websocket"
   "github.com/natefinch/atomic"
@@ -38,6 +39,11 @@ func NewHashRateStdOutSink() *hashRateStdOutSink {
 	return &hashRateStdOutSink{}
 }
 
+type CurrentHashRate struct {
+	Timestamp int64   `json:"timestamp"`
+	HashRate  float64 `json:"hashrate"`
+}
+
 func NewHashRateSocketSink(endpoint string, sendFrequency int) *hashRateSocketSink {
 	sockets := make(map[*websocket.Conn]bool)
 	upgrader := &websocket.Upgrader{
@@ -59,7 +65,7 @@ func NewHashRateSocketSink(endpoint string, sendFrequency int) *hashRateSocketSi
 	http.HandleFunc("/hashrate/stream", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			fmt.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -72,11 +78,24 @@ func NewHashRateSocketSink(endpoint string, sendFrequency int) *hashRateSocketSi
 			return
 		}
 
-		message := fmt.Sprintf("%d,%.6f", sink.lastSendTimestamp, sink.lastTotalHashRate)
-		fmt.Fprintln(w, message)
+		currentHashRate := CurrentHashRate{
+			Timestamp: sink.lastSendTimestamp,
+			HashRate: sink.lastTotalHashRate,
+		}
+
+		js, err := json.Marshal(currentHashRate)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
 	})
 
-	go func() { http.ListenAndServe(endpoint, nil) }()
+	go func() {
+		http.ListenAndServe(endpoint, nil)
+	}()
 
 	return sink
 }
@@ -114,12 +133,22 @@ func (s *hashRateSocketSink) SetCurrentHashRates(hashRates map[int]float64) erro
 
 	s.lastSendTimestamp = timestamp
 	s.lastTotalHashRate = total
-	message := fmt.Sprintf("%.6f", total)
+	// message := fmt.Sprintf("%.6f", total)
 	// _, err := s.socket.Send(message, 0)
 
 	for socket := range s.sockets {
-		// mu.Lock()
-		err := socket.WriteMessage(websocket.TextMessage, []byte(message))
+		currentHashRate := CurrentHashRate{
+			Timestamp: s.lastSendTimestamp,
+			HashRate: s.lastTotalHashRate,
+		}
+
+		js, err := json.Marshal(currentHashRate)
+		if err != nil {
+			log.Printf("Websocket error: %s", err)
+			continue
+		}
+
+		err = socket.WriteMessage(websocket.TextMessage, []byte(js))
 		if err != nil {
 			log.Printf("Websocket error: %s", err)
 			socket.Close()
