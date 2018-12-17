@@ -1,5 +1,5 @@
-hash: 68039bead0ef64dcd93b0912af1e6aadc54ffaa92ea6c48108c03bae5bd5a14b
-updated: 2018-12-17T02:28:10.20783Z
+hash: a3a2abec70eaaa46dd242d63d00de0f88e02ded205d05eb78af9b738ba40ea55
+updated: 2018-12-17T05:12:11.1386812Z
 imports:
 - name: github.com/google/go-cmp
   version: 2248b49eaa8e1c8c0963ee77b40841adbc19d4ca
@@ -10,8 +10,6 @@ imports:
   - cmp/internal/value
 - name: github.com/gorilla/websocket
   version: 95ba29eb981bbb27d92e1f70bf8a1949452d926b
-- name: github.com/natefinch/atomic
-  version: a62ce929ffcc871a51e98c6eba7b20321e3ed62d
 - name: github.com/robvanmieghem/go-opencl
   version: 5ca28f1a8220f79ffacbaa12e4dff1628b708307
   subpackages:

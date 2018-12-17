@@ -60,7 +60,7 @@ func main() {
 	}
 
 	if len(clDevices) == 0 {
-		log.Println("No suitable opencl devices found")
+		log.Println("No suitable OpenCL devices found")
 		os.Exit(1)
 	}
 
@@ -93,32 +93,16 @@ func main() {
 	if !ok {
 		socketEndpoint = ":5555"
 	}
+
 	hashRatesSocketFrequency := 1 // 1 second
 	if socketFrequencyStr, ok := os.LookupEnv("SENTIENT_MINER_CURRENT_HASHRATE_FREQUENCY"); ok {
 		if i64, err := strconv.ParseInt(socketFrequencyStr, 10, 32); err == nil {
 			hashRatesSocketFrequency = int(i64)
 		}
 	}
-	hashRatesLogPath, ok := os.LookupEnv("SENTIENT_MINER_HASHRATES_LOG_PATH")
-	if !ok {
-		hashRatesLogPath = "./hashrates.log"
-	}
-	hashRatesLogFrequency := 10 * 60 // 10 minutes
-	if logFrequencyStr, ok := os.LookupEnv("SENTIENT_MINER_HASHRATES_LOG_FREQUENCY"); ok {
-		if i64, err := strconv.ParseInt(logFrequencyStr, 10, 32); err == nil {
-			hashRatesLogFrequency = int(i64)
-		}
-	}
-	maxLogLines := 10000
-	if maxLogLinesStr, ok := os.LookupEnv("SENTIENT_MINER_HASHRATES_LOG_MAX_LINES"); ok {
-		if i64, err := strconv.ParseInt(maxLogLinesStr, 10, 32); err == nil {
-			maxLogLines = int(i64)
-		}
-	}
 
 	stdOutSink := mining.NewHashRateStdOutSink()
 	socketSink := mining.NewHashRateSocketSink(socketEndpoint, hashRatesSocketFrequency)
-	loggerSink := mining.NewHashRateLoggerSink(hashRatesLogPath, hashRatesLogFrequency, maxLogLines)
 
 	//Start printing out the hashrates of the different gpu's
 	hashRateReports := make(map[int]float64)
@@ -131,7 +115,6 @@ func main() {
 
 		stdOutSink.SetCurrentHashRates(hashRateReports)
 		socketSink.SetCurrentHashRates(hashRateReports)
-		loggerSink.SetCurrentHashRates(hashRateReports)
 	}
 }
 

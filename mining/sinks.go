@@ -3,15 +3,11 @@ package mining
 import (
 	"fmt"
 	"log"
-	"os"
-	"strings"
 	"time"
-	"bufio"
 	"net/http"
 	"encoding/json"
 
 	"github.com/gorilla/websocket"
-  "github.com/natefinch/atomic"
 )
 
 type HashRateSink interface {
@@ -26,13 +22,6 @@ type hashRateSocketSink struct {
 	sendFrequency     int // Number of seconds between sends
 	lastSendTimestamp int64
 	lastTotalHashRate float64
-}
-
-type hashRateLoggerSink struct {
-	filePath         string
-	logFrequency     int // Number of seconds between logs
-	lastLogTimestamp int64
-	maxLogLines      int // Max number of lines the log file is allowed to grow to
 }
 
 func NewHashRateStdOutSink() *hashRateStdOutSink {
@@ -100,15 +89,6 @@ func NewHashRateSocketSink(endpoint string, sendFrequency int) *hashRateSocketSi
 	return sink
 }
 
-func NewHashRateLoggerSink(filePath string, logFrequency int, maxLogLines int) *hashRateLoggerSink {
-	return &hashRateLoggerSink{
-		filePath: filePath,
-		logFrequency: logFrequency,
-		lastLogTimestamp: 0,
-		maxLogLines: maxLogLines,
-	}
-}
-
 func (s *hashRateStdOutSink) SetCurrentHashRates(hashRates map[int]float64) error {
 	fmt.Print("\r")
 	var total float64
@@ -133,8 +113,6 @@ func (s *hashRateSocketSink) SetCurrentHashRates(hashRates map[int]float64) erro
 
 	s.lastSendTimestamp = timestamp
 	s.lastTotalHashRate = total
-	// message := fmt.Sprintf("%.6f", total)
-	// _, err := s.socket.Send(message, 0)
 
 	for socket := range s.sockets {
 		currentHashRate := CurrentHashRate{
@@ -157,75 +135,4 @@ func (s *hashRateSocketSink) SetCurrentHashRates(hashRates map[int]float64) erro
 	}
 
 	return nil
-}
-
-func (s *hashRateLoggerSink) SetCurrentHashRates(hashRates map[int]float64) error {
-	var total float64
-	for _, hashRate := range hashRates {
-		total += hashRate
-	}
-
-	timestamp := time.Now().Unix()
-	if timestamp - s.lastLogTimestamp < int64(s.logFrequency) {
-		return nil
-	}
-	s.lastLogTimestamp = timestamp
-
-	lines, err := readLines(s.filePath)
-	if err != nil {
-		log.Println("Unable to read hashrates log")
-		return err
-	}
-
-	offset := max(len(lines) - s.maxLogLines - 1, 0)
-	newLogLine := fmt.Sprintf("%d,%.6f", timestamp, total)
-	lines = append(lines, newLogLine)
-	lines = lines[offset:]
-	if err := atomicWriteLines(lines, s.filePath); err != nil {
-		log.Println("Unable to write hashrates log")
-		return err
-	}
-	return nil
-}
-
-func readLines(path string) ([]string, error) {
-  file, err := os.OpenFile(path, os.O_RDONLY|os.O_CREATE, 0644)
-  if err != nil {
-    return nil, err
-  }
-  defer file.Close()
-
-  var lines []string
-  scanner := bufio.NewScanner(file)
-	// scanner.Split(bufio.ScanLines)
-  for scanner.Scan() {
-    lines = append(lines, strings.TrimSpace(scanner.Text()))
-  }
-  return lines, scanner.Err()
-}
-
-func atomicWriteLines(lines []string, path string) error {
-  reader := strings.NewReader(strings.Join(lines, "\n"))
-  return atomic.WriteFile(path, reader)
-}
-
-func writeLines(lines []string, path string) error {
-  file, err := os.Create(path)
-  if err != nil {
-    return err
-  }
-  defer file.Close()
-
-  w := bufio.NewWriter(file)
-  for _, line := range lines {
-    fmt.Fprintln(w, line)
-  }
-  return w.Flush()
-}
-
-func max(x, y int) int {
-    if x > y {
-        return x
-    }
-    return y
 }
