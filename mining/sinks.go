@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 	"bufio"
+	"net/http"
 
-	zmq "github.com/pebbe/zmq4"
+	"github.com/gorilla/websocket"
   "github.com/natefinch/atomic"
 )
 
@@ -19,9 +20,11 @@ type HashRateSink interface {
 type hashRateStdOutSink struct {}
 
 type hashRateSocketSink struct {
-	socket            *zmq.Socket
+	sockets           map[*websocket.Conn]bool
+	upgrader          *websocket.Upgrader
 	sendFrequency     int // Number of seconds between sends
 	lastSendTimestamp int64
+	lastTotalHashRate float64
 }
 
 type hashRateLoggerSink struct {
@@ -35,12 +38,47 @@ func NewHashRateStdOutSink() *hashRateStdOutSink {
 	return &hashRateStdOutSink{}
 }
 
-func NewHashRateSocketSink(socket *zmq.Socket, sendFrequency int) *hashRateSocketSink {
-	return &hashRateSocketSink{
-		socket: socket,
+func NewHashRateSocketSink(endpoint string, sendFrequency int) *hashRateSocketSink {
+	sockets := make(map[*websocket.Conn]bool)
+	upgrader := &websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+
+	sink := &hashRateSocketSink{
+		sockets: sockets,
 		sendFrequency: sendFrequency,
 		lastSendTimestamp: 0,
+		lastTotalHashRate: 0,
+		upgrader: upgrader,
 	}
+
+	http.HandleFunc("/hashrate/stream", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		sockets[conn] = true
+	})
+
+	http.HandleFunc("/hashrate", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			fmt.Println("Invalid HTTP Method for GET /hashrate")
+			return
+		}
+
+		message := fmt.Sprintf("%d,%.6f", sink.lastSendTimestamp, sink.lastTotalHashRate)
+		fmt.Fprintln(w, message)
+	})
+
+	go func() { http.ListenAndServe(endpoint, nil) }()
+
+	return sink
 }
 
 func NewHashRateLoggerSink(filePath string, logFrequency int, maxLogLines int) *hashRateLoggerSink {
@@ -75,8 +113,21 @@ func (s *hashRateSocketSink) SetCurrentHashRates(hashRates map[int]float64) erro
 	}
 
 	s.lastSendTimestamp = timestamp
-	_, err := s.socket.Send(fmt.Sprintf("%.6f", total), 0)
-	return err
+	s.lastTotalHashRate = total
+	message := fmt.Sprintf("%.6f", total)
+	// _, err := s.socket.Send(message, 0)
+
+	for socket := range s.sockets {
+		// mu.Lock()
+		err := socket.WriteMessage(websocket.TextMessage, []byte(message))
+		if err != nil {
+			log.Printf("Websocket error: %s", err)
+			socket.Close()
+			delete(s.sockets, socket)
+		}
+	}
+
+	return nil
 }
 
 func (s *hashRateLoggerSink) SetCurrentHashRates(hashRates map[int]float64) error {

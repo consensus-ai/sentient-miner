@@ -1,5 +1,5 @@
-hash: 778e58d31e7555eedc06161f24ca2d32cae6446d3cc5c5e7f9c1be740430e955
-updated: 2018-11-23T01:31:46.5215744Z
+hash: 68039bead0ef64dcd93b0912af1e6aadc54ffaa92ea6c48108c03bae5bd5a14b
+updated: 2018-12-17T02:28:10.20783Z
 imports:
 - name: github.com/google/go-cmp
   version: 2248b49eaa8e1c8c0963ee77b40841adbc19d4ca
@@ -8,20 +8,20 @@ imports:
   - cmp/internal/diff
   - cmp/internal/function
   - cmp/internal/value
+- name: github.com/gorilla/websocket
+  version: 95ba29eb981bbb27d92e1f70bf8a1949452d926b
 - name: github.com/natefinch/atomic
   version: a62ce929ffcc871a51e98c6eba7b20321e3ed62d
-- name: github.com/pebbe/zmq4
-  version: 3515f4e6f439e167f92f2b99a9497cf5ea8e3cea
 - name: github.com/robvanmieghem/go-opencl
   version: 5ca28f1a8220f79ffacbaa12e4dff1628b708307
   subpackages:
   - cl
 - name: golang.org/x/crypto
-  version: 3d3f9f413869b949e48070b5bc593aa22cc2b8f2
+  version: 505ab145d0a99da450461ae2c1a9f6cd10d1f447
   subpackages:
   - blake2b
 - name: golang.org/x/sys
-  version: 62eef0e2fa9b2c385f7b2778e763486da6880d37
+  version: 4d1cda033e0619309c606fc686de3adcf599539e
   subpackages:
   - cpu
 testImports: []

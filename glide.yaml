@@ -4,6 +4,6 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - blake2b
-- package: github.com/pebbe/zmq4
+- package: github.com/gorilla/websocket
 - package: github.com/natefinch/atomic
 - package: github.com/google/go-cmp/cmp

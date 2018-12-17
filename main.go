@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	zmq "github.com/pebbe/zmq4"
 	"github.com/robvanmieghem/go-opencl/cl"
 	"github.com/consensus-ai/sentient-miner/algorithms/sentient"
 	"github.com/consensus-ai/sentient-miner/mining"
@@ -90,15 +89,9 @@ func main() {
 	}
 	miner.Mine()
 
-	socket, err := zmq.NewSocket(zmq.PUB)
-	if err != nil {
-		log.Println("Unable to create zmq socket for publishing hashrates")
-	}
-	defer socket.Close()
-
 	socketEndpoint, ok := os.LookupEnv("SENTIENT_MINER_CURRENT_HASHRATE_ENDPOINT")
 	if !ok {
-		socketEndpoint = "tcp://127.0.0.1:5555"
+		socketEndpoint = ":5555"
 	}
 	hashRatesSocketFrequency := 1 // 1 second
 	if socketFrequencyStr, ok := os.LookupEnv("SENTIENT_MINER_CURRENT_HASHRATE_FREQUENCY"); ok {
@@ -123,10 +116,8 @@ func main() {
 		}
 	}
 
-	socket.Bind(socketEndpoint)
-	socket.SetLinger(0)
 	stdOutSink := mining.NewHashRateStdOutSink()
-	socketSink := mining.NewHashRateSocketSink(socket, hashRatesSocketFrequency)
+	socketSink := mining.NewHashRateSocketSink(socketEndpoint, hashRatesSocketFrequency)
 	loggerSink := mining.NewHashRateLoggerSink(hashRatesLogPath, hashRatesLogFrequency, maxLogLines)
 
 	//Start printing out the hashrates of the different gpu's
