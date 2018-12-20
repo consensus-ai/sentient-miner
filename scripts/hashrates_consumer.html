@@ -1,0 +1,30 @@
+<!--
+Quick and dirty example script on how to consume sentient-miner hashrates
+(e.x. like the wallet app would). It prints the received current hash rates
+over zmq as well as the historical hash rates written to a log file.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript">
+    function startWebsocket() {
+      var ws = new WebSocket("ws://localhost:5555/hashrate/stream");
+
+      ws.onmessage = function (e) {
+        var myTextArea = document.getElementById("textarea");
+        myTextArea.value = myTextArea.value + "\n" + e.data;
+      };
+
+      ws.onclose = function() {
+        var myTextArea = document.getElementById("textarea");
+        myTextArea.value = myTextArea.value + "\n" + "Connection closed";
+      };
+    }
+  </script>
+</head>
+<body>
+  <button onclick="javascript:startWebsocket()">Subscribe</button>
+  <br />
+  <textarea id="textarea">Output</textarea>
+</body>
+</html>
