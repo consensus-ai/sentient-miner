@@ -21,14 +21,6 @@ RUN apt-get update && \
     checkinstall \
     git
 
-RUN wget https://github.com/zeromq/libzmq/releases/download/v4.2.1/zeromq-4.2.1.tar.gz && \
-  tar -xvzf zeromq-4.2.1.tar.gz && \
-  cd zeromq-4.2.1 && \
-  ./configure && \
-  make && \
-  checkinstall && \
-  ldconfig
-
 RUN ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
 
 RUN curl -s https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -v -C /usr/local -xz
