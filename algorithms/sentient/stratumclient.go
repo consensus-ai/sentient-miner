@@ -81,7 +81,7 @@ func (sc *StratumClient) Start() {
 
 	//Subscribe for mining
 	//Close the connection on an error will cause the client to generate an error, resulting in te errorhandler to be triggered
-	result, err := sc.stratumclient.Call("mining.subscribe", []string{fmt.Sprintf("sentient-miner/%d", sc.Version)})
+	result, err := sc.stratumclient.Call("mining.subscribe", []string{fmt.Sprintf("sentient-miner/%s", sc.Version)})
 	if err != nil {
 		log.Println("ERROR Error in response from stratum:", err)
 		sc.stratumclient.Close()

@@ -35,7 +35,7 @@ var provenSolutions = []struct {
 		submittedHeader: []byte{
 			0, 0, 0, 0, 0, 0, 26, 158, 25, 209, 169, 53, 113, 22, 90, 11, 72, 7, 222, 103, 247, 244, 163, 156, 158, 5, 53, 126, 186, 215, 88, 48,
 			// 88, 47, 107, 95, 0, 0, 0, 0,
-			99, 168, 5, 0, 0, 0, 0, 0,
+			132, 26, 5, 0, 0, 0, 0, 0,
 			20, 25, 103, 87, 0, 0, 0, 0, 218, 189, 84, 137, 247, 169, 197, 113, 213, 120, 125, 148, 92, 197, 47, 212, 250, 153, 114, 53, 199, 209, 183, 97, 28, 242, 206, 120, 191, 202, 34, 9},
 	},
 }
@@ -101,7 +101,9 @@ func (v *submittedHeaderValidator) validate(t *testing.T) {
 	for _, provenSolution := range provenSolutions {
 		submittedHeader := <-v.submittedHeaders
 		if !bytes.Equal(submittedHeader, provenSolution.submittedHeader) {
-			t.Error("Mismatch\nExpected header: ", provenSolution.submittedHeader, "\nSubmitted header: ", submittedHeader)
+			t.Error(
+				"Mismatch\nExpected header:\t", provenSolution.submittedHeader,
+				"\nSubmitted header:\t", submittedHeader)
 		}
 	}
 }
