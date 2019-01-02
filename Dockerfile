@@ -1,7 +1,12 @@
 FROM pkienzle/opencl_docker
 MAINTAINER Julian Villella <julian@objectspace.io>
 
+ARG GOOS=linux
+ARG GOARCH=amd64
+ARG CC_FOR_TARGET=gcc
+
 ARG USER=appuser
+
 RUN groupadd -g 999 $USER && useradd -mr -u 999 -g $USER $USER
 
 ARG GOLANG_VERSION=1.10.4
@@ -14,14 +19,17 @@ RUN apt-get update && \
     ca-certificates \
     wget \
     zip \
+    bison \
     libtool \
     autoconf \
     automake \
     uuid-dev \
     checkinstall \
-    git
+    git \
+    mingw-w64
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so
+COPY ./build/OpenCL.dll /usr/x86_64-w64-mingw32/lib/OpenCL.dll
 
 RUN curl -s https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -v -C /usr/local -xz
 

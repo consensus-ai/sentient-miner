@@ -180,14 +180,16 @@ From your host machine,
 ```bash
 gvm use go1.11 # If you're using GVM
 cd $GOPATH/src/github.com/consensus-ai/sentient-miner
-./release.sh $(pwd)/private.pem $(pwd)/public.pem <version-number>
+./release.sh $(pwd)/private.pem $(pwd)/public.pem <platform> <architecture> <version-number>
+# E.x. ./release.sh $(pwd)/private.pem $(pwd)/public.pem darwin amd64 1.0
 ```
 
-Or through docker (e.x. to build Linux binary from macOS)
+Or through docker (e.x. to build Linux binary or Windows binary from macOS)
 ```bash
 docker build -t sentient-miner .
 docker run -it --rm -v $(pwd)/:/home/appuser/go/src/github.com/consensus-ai/sentient-miner sentient-miner bash
-./release.sh $(pwd)/private.pem $(pwd)/public.pem <version-number>
+./release.sh $(pwd)/private.pem $(pwd)/public.pem <platform> <architecture> <version-number>
+# E.x. CC_FOR_TARGET=x86_64-w64-mingw32-gcc ./release.sh $(pwd)/private.pem $(pwd)/public.pem windows amd64 1.0
 
 # Binaries will be on host machine under sentient-miner/release/
 ```

@@ -27,7 +27,7 @@ func main() {
 	flag.IntVar(&intensity, "I", intensity, "Intensity")
 	host := flag.String("url", "localhost:9910", "daemon or server host and port, for stratum servers, use `stratum+tcp://<host>:<port>`")
 	pooluser := flag.String("user", "payoutaddress.rigname", "username, most stratum servers take this in the form [payoutaddress].[rigname]")
-	excludedGPUs := flag.String("E", "", "Exclude GPU's: comma separated list of device numbers")
+	excludedDevices := flag.String("E", "", "Exclude devices: comma separated list of device numbers")
 	flag.Parse()
 
 	if *printVersion {
@@ -67,7 +67,7 @@ func main() {
 	//Filter the excluded devices
 	miningDevices := make(map[int]*cl.Device)
 	for i, device := range clDevices {
-		if deviceExcludedForMining(i, *excludedGPUs) {
+		if deviceExcludedForMining(i, *excludedDevices) {
 			continue
 		}
 		miningDevices[i] = device
@@ -119,10 +119,10 @@ func main() {
 }
 
 //deviceExcludedForMining checks if the device is in the exclusion list
-func deviceExcludedForMining(deviceID int, excludedGPUs string) bool {
-	excludedGPUList := strings.Split(excludedGPUs, ",")
-	for _, excludedGPU := range excludedGPUList {
-		if strconv.Itoa(deviceID) == excludedGPU {
+func deviceExcludedForMining(deviceID int, excludedDevices string) bool {
+	excludedDevicesList := strings.Split(excludedDevices, ",")
+	for _, excludedDevice := range excludedDevicesList {
+		if strconv.Itoa(deviceID) == excludedDevice {
 			return true
 		}
 	}

@@ -7,6 +7,11 @@ GIT_DIRTY=$(shell git diff-index --quiet HEAD -- || echo "✗-")
 ldflags= -X "github.com/consensus-ai/sentient-miner/build.GitRevision=${GIT_DIRTY}${GIT_REVISION}" \
 -X "github.com/consensus-ai/sentient-miner/build.BuildTime=${BUILD_TIME}"
 
+GOOS ?= linux
+GOARCH ?= amd64
+CC_FOR_TARGET ?= gcc
+APPNAME ?= sentient-miner
+
 # all will build and install release binaries
 all: release
 
@@ -44,7 +49,8 @@ dev:
 
 # release builds and installs release binaries.
 release:
-	go install -tags='netgo' -a -ldflags='-s -w $(ldflags)' $(pkgs)
+	CGO_ENABLED=1 GOOS=${GOOS} GOARCH=${GOARCH} CC=${CC_FOR_TARGET} CC_FOR_TARGET=${CC_FOR_TARGET} \
+		go install -tags='netgo' -a -ldflags='-s -w $(ldflags)' $(pkgs)
 
 # clean removes all directories that get automatically created during
 # development.

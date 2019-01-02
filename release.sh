@@ -10,22 +10,18 @@ fi
 
 privkeyFile=$1
 pubkeyFile=$2
-version=$3
-
-if [ `uname -s` = Darwin ]; then
-  os="osx"
-else
-  os="linux"
-fi
+os=$3
+arch=$4
+version=$5
 
 # ensure we have a clean state, then build binary
 make clean
 make dependencies
-make release
+GOOS=$os GOARCH=$arch make release
 
 # create release
 compiledBinary="sentient-miner"
-binarySuffix="${version}-${os}-amd64"
+binarySuffix="${version}-${os}-${arch}"
 binaryName="${compiledBinary}-${binarySuffix}"
 zipFile="${binaryName}.zip"
 
@@ -33,7 +29,9 @@ mkdir release
 
 (
   cd release
-  cp $GOPATH/bin/$compiledBinary $binaryName
+  cp $GOPATH/bin/${os}_${arch}/${compiledBinary}* $binaryName 2>/dev/null || :
+  cp $GOPATH/bin/${compiledBinary}* $binaryName 2>/dev/null || :
+
 
   chmod +x $binaryName
   zip -r $zipFile $binaryName
