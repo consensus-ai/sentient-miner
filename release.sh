@@ -32,14 +32,16 @@ mkdir release
   cp $GOPATH/bin/${os}_${arch}/${compiledBinary}* $binaryName 2>/dev/null || :
   cp $GOPATH/bin/${compiledBinary}* $binaryName 2>/dev/null || :
 
+  if [ "$os" == "windows" ]; then
+    mv $binaryName ${binaryName}.exe
+    binaryName=${binaryName}.exe
+  fi
 
   chmod +x $binaryName
   zip -r $zipFile $binaryName
 
   openssl dgst -sha256 -sign $privkeyFile -out $zipFile.sig $zipFile
-  if [[ -n $pubkeyFile ]]; then
-    openssl dgst -sha256 -verify $pubkeyFile -signature $zipFile.sig $zipFile
-  fi
+  openssl dgst -sha256 -verify $pubkeyFile -signature $zipFile.sig $zipFile
 )
 
 echo "Done"
